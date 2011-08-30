@@ -83,6 +83,21 @@
             <version>3.4.1.Final</version>
         </dependency>
         <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-infinispan</artifactId>
+            <version>3.4.1.Final</version>
+        </dependency>
+         <dependency>
+            <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-core</artifactId>
+            <version>5.0.0.FINAL</version>
+        </dependency>
+        <dependency>
+            <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-lucene-directory</artifactId>
+            <version>5.0.0.FINAL</version>
+        </dependency>
+        <dependency>
             <groupId>com.atomikos</groupId>
             <artifactId>transactions</artifactId>
             <version>${atomikos.version}</version>
@@ -132,4 +147,10 @@
             <version>5.5.0</version>
         </dependency>
     </dependencies>
+    <repositories>
+        <repository>
+            <id>jboss</id>
+            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+        </repository>
+    </repositories>
 </project>

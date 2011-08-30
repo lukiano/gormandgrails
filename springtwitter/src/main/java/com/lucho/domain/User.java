@@ -4,6 +4,8 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Entity;
 
+import java.util.List;
+
 /**
  * Created by IntelliJ IDEA.
  * User: lucianol
@@ -14,5 +16,13 @@ import org.hibernate.annotations.Entity;
 @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 @Entity
 public class User {
+
+    private int id;
+
+    private String nickname;
+
+    private String password;
+
+    private List<User> follows;
 
 }
