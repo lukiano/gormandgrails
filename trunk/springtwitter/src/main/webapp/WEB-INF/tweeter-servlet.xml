@@ -27,7 +27,7 @@
     <tx:annotation-driven/>
 
     <sec:http auto-config='true'>
-        <sec:intercept-url pattern="/**" access="ROLE_USER"/>
+        <sec:intercept-url pattern="/t/**" access="ROLE_USER"/>
     </sec:http>
     <!--
          Construct Atomikos UserTransactionManager,
@@ -90,6 +90,10 @@
             <value>DATOPIC</value>
         </property>
     </bean>
+
+
+    <bean id="messageListener" class="com.lucho.service.TwitterMessageListener"/>
+
     <!--
          a kind of message listener pool that will listen to
          messages posted to 'requestQueue' with 3 threads,
@@ -99,7 +103,7 @@
           class="org.springframework.jms.listener.DefaultMessageListenerContainer">
         <property name="transactionManager" ref="transactionManager"/>
         <property name="connectionFactory" ref="connectionFactory"/>
-        <property name="messageListener" ref="MessageListener"/>
+        <property name="messageListener" ref="messageListener"/>
         <property name="destinationName" value="requestQueue"/>
         <property name="concurrentConsumers" value="1"/>
         <property name="receiveTimeout" value="3000"/>
@@ -154,13 +158,11 @@
     </bean>
 
     <bean id="sessionFactory"
-          class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+          class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
 
-        <property name="mappingResources">
+        <property name="packagesToScan">
             <list>
-                <!-- list all your Hibernate mapping file locations here -->
-                <value>...</value>
-                ...
+                <value>com.lucho.domain</value>
             </list>
         </property>
 
