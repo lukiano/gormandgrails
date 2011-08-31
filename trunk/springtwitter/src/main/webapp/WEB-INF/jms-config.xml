@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <bean id="xaFactory"
+          class="org.apache.activemq.ActiveMQXAConnectionFactory">
+        <property name="brokerURL" value="tcp://localhost:61616"/>
+    </bean>
+
+    <!--
+         Configure the JMS connector;
+         call init to register for recovery!
+    -->
+    <bean id="connectionFactory"
+          class="com.atomikos.jms.AtomikosConnectionFactoryBean"
+          init-method="init" destroy-method="close">
+        <property name="uniqueResourceName" value="DATOPIC_BROKER"/>
+        <property name="xaConnectionFactory" ref="xaFactory"/>
+    </bean>
+
+
+    <!--
+         Where do we send updated time table info to?
+         Note: this is a topic to allow multiple subscribers.
+    -->
+    <bean id="topic" class="org.apache.activemq.command.ActiveMQTopic">
+        <property name="physicalName">
+            <value>DATOPIC</value>
+        </property>
+    </bean>
+
+
+    <bean id="messageListener" class="com.lucho.service.TwitterMessageListener"/>
+
+    <!--
+         a kind of message listener pool that will listen to
+         messages posted to 'requestQueue' with 3 threads,
+         each one consuming a connection from bean 'ConnectionFactory'
+    -->
+    <bean id="MessageListenerContainer"
+          class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="messageListener" ref="messageListener"/>
+        <property name="destinationName" value="requestQueue"/>
+        <property name="concurrentConsumers" value="1"/>
+        <property name="receiveTimeout" value="3000"/>
+        <property name="sessionTransacted" value="true"/>
+    </bean>
+    <!--
+      JMS template for easy sending of timetable update messages with Spring
+    -->
+    <bean id="jmsTemplate"
+          class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory">
+            <ref bean="connectionFactory"/>
+        </property>
+        <property name="defaultDestination">
+            <ref bean="topic"/>
+        </property>
+        <property name="receiveTimeout" value="1000"/>
+        <property name="sessionTransacted" value="true"/>
+    </bean>
+
+</beans>
