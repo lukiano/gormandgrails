@@ -1,11 +1,18 @@
 package com.lucho.controller;
 
+import com.lucho.domain.Tweet;
+import com.lucho.domain.User;
 import com.lucho.service.TweetService;
+import com.lucho.service.TwitterMessageListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.validation.Valid;
 import java.security.Principal;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -17,26 +24,54 @@ import java.security.Principal;
 @Controller
 public class TweetController {
 
+    public TwitterMessageListener getTwitterMessageListener() {
+        return twitterMessageListener;
+    }
+
     @Autowired
+    public void setTwitterMessageListener(final TwitterMessageListener twitterMessageListener) {
+        this.twitterMessageListener = twitterMessageListener;
+    }
+
+    private TwitterMessageListener twitterMessageListener;
+
     public TweetService getTweetService() {
         return tweetService;
     }
 
-    public void setTweetService(TweetService tweetService) {
+    @Autowired
+    public void setTweetService(final TweetService tweetService) {
         this.tweetService = tweetService;
     }
 
     private TweetService tweetService;
 
-    public void newTweet(Principal principal, @Valid String tweet) {
-
+    @RequestMapping(value = "/t/new", method = RequestMethod.POST)
+    public void newTweet(final Principal principal, final String tweet) {
+        User user = null;
+        this.getTweetService().newTweet(user, tweet);
     }
 
-    public void searchInTweets(Principal principal, String text) {
-
+    @RequestMapping(value = "/t/search", method = RequestMethod.GET)
+    public List<Tweet> searchInTweets(final Principal principal, final String text) {
+        User user = null;
+        return this.getTweetService().searchTweets(text);
     }
 
-    public void getTweets(Principal principal) {
+    @RequestMapping(value = "/t/get", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    List<Tweet> getTweets(final Principal principal) {
+        principal.getName();
+        User user = null;
+        return this.getTweetService().getTweetsForUser(user);
+    }
 
+    @RequestMapping(value = "/t/shouldrefresh", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    Boolean shouldrefresh(final Principal principal) {
+        User user = null;
+        return this.getTwitterMessageListener().getUsersToBeRefreshed().contains(user.getId());
     }
 }

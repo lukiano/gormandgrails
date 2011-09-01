@@ -9,7 +9,7 @@
         http://activemq.apache.org/schema/core/activemq-core.xsd">
 
 
-    <amq:broker id="twBroker" useJmx="false" persistent="false">
+    <amq:broker id="twBroker" useJmx="false" persistent="false" useShutdownHook="false">
         <amq:transportConnectors>
             <amq:transportConnector uri="vm://localhost"/>
         </amq:transportConnectors>
@@ -56,7 +56,8 @@
          each one consuming a connection from bean 'ConnectionFactory'
     -->
     <bean id="MessageListenerContainer"
-          class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+          class="org.springframework.jms.listener.DefaultMessageListenerContainer"
+          depends-on="AtomikosTransactionManager">
         <property name="transactionManager" ref="transactionManager"/>
         <property name="connectionFactory" ref="connectionFactory"/>
         <property name="messageListener" ref="messageListener"/>

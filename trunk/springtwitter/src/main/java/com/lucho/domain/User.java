@@ -2,6 +2,7 @@ package com.lucho.domain;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -26,19 +27,22 @@ import java.util.List;
 public class User implements UserDetails {
 
     @Id
+    @GeneratedValue
     private Integer id;
 
     @NotNull
+    @NotBlank
     @Size(max = 32)
     @Column(name = "username", unique=true)
     private String username;
 
     @NotNull
+    @NotBlank
     @Size(min = 6, max = 32)
     private String password;
 
     @OneToMany
-    private List<User> follows;
+    private List<User> followedBy;
 
     @Transient
     private List<GrantedAuthority> authorities;
@@ -94,12 +98,12 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    public List<User> getFollows() {
-        return follows;
+    public List<User> getFollowedBy() {
+        return followedBy;
     }
 
-    public void setFollows(List<User> follows) {
-        this.follows = follows;
+    public void setFollows(List<User> followedBy) {
+        this.followedBy = followedBy;
     }
 
     public void setAuthorities(List<GrantedAuthority> authorities) {

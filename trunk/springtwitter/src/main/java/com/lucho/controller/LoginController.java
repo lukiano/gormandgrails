@@ -1,10 +1,12 @@
 package com.lucho.controller;
 
+import com.lucho.service.TwitterMessageListener;
 import com.lucho.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
@@ -17,35 +19,33 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class LoginController {
 
-    @Autowired
     public UserService getUserService() {
         return userService;
     }
 
-    public void setUserService(UserService userService) {
+    @Autowired
+    public void setUserService(final UserService userService) {
         this.userService = userService;
     }
 
     private UserService userService;
 
-    @RequestMapping(value = "/pepe", method = RequestMethod.GET)
-    public String pepe() {
-         return "pepe2";
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public
+    @ResponseBody
+    Boolean register(final String username, final String password) {
+        if (!this.getUserService().userExists(username)) {
+            this.getUserService().addUser(username, password);
+            return true;
+        }
+        return false;
     }
 
-    @RequestMapping(value = "/pepe2", method = RequestMethod.GET)
-    public @ResponseBody String pepe2() {
-         return "pepe3";
-    }
-
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public void login(String username, String password) {
-
-    }
-
-    @RequestMapping(value = "/signup", method = RequestMethod.POST)
-    public void signup(String username, String password) {
-
+    @RequestMapping(value = "/exists", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    Boolean exists(final @RequestParam(value="name") String username) {
+        return this.getUserService().userExists(username);
     }
 
 }

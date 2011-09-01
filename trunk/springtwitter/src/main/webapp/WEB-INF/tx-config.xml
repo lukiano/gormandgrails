@@ -16,7 +16,7 @@
     -->
     <bean id="AtomikosTransactionManager"
           class="com.atomikos.icatch.jta.UserTransactionManager"
-          init-method="init" destroy-method="close">
+          init-method="init" destroy-method="close" depends-on="datasource">
 
         <!--
               when close is called, should we force
@@ -30,7 +30,7 @@
          needed to configure Spring
     -->
     <bean id="AtomikosUserTransaction"
-          class="com.atomikos.icatch.jta.UserTransactionImp">
+          class="com.atomikos.icatch.jta.UserTransactionImp" depends-on="datasource">
 
         <property name="transactionTimeout" value="300"/>
     </bean>
