@@ -31,7 +31,7 @@
                 <prop key="user">twitter</prop>
                 <prop key="password">twitter</prop>
                 <prop key="databaseName">/Users/lucianol/derby/twitterdb</prop>
-                <prop key="createDatabase">true</prop>
+                <prop key="createDatabase">false</prop>
             </props>
         </property>
         <!-- how many connections in the pool? -->
@@ -58,6 +58,7 @@
         <!-- IMPORTANT: make sure to tell Hibernate to use JTA -->
         <property name="hibernateProperties">
             <props>
+                <prop key="hbm2ddl.auto">update</prop>
                 <prop key="hibernate.dialect">org.hibernate.dialect.DerbyDialect</prop>
                 <!-- <prop key="hibernate.connection.isolation">3</prop>    -->
                 <prop key="hibernate.current_session_context_class">jta</prop>
@@ -78,6 +79,10 @@
                 <prop key="hibernate.cache.infinispan.entity.eviction.max_entries">5000</prop>
                 <prop key="hibernate.cache.infinispan.entity.expiration.lifespan">60000</prop>
                 <prop key="hibernate.cache.infinispan.entity.expiration.max_idle">30000</prop>
+
+                <prop key="hibernate.search.default.directory_provider">infinispan</prop>
+                <prop key="hibernate.search.default.data_cachename">data_l</prop>
+                <prop key="hibernate.search.default.metadata_cachename">metadata_l</prop>
             </props>
         </property>
 

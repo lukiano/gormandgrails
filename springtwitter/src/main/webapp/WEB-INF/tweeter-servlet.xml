@@ -12,6 +12,27 @@
         http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
     <context:component-scan base-package="com.lucho.controller"/>
+    <mvc:default-servlet-handler/>
     <mvc:annotation-driven/>
-    <!-- <mvc:default-servlet-handler/> -->
+
+    <!-- Resolves logical view names returned by Controllers to Tiles; a view name to resolve is treated as the name of a tiles definition -->
+    <bean id="tilesViewResolver" class="org.springframework.web.servlet.view.tiles2.TilesViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.tiles2.TilesView"/>
+    </bean>
+
+    <!-- Map paths directly to view names without controller processing. Use the view-name attribute if necessary: by convention the view name equals the path without the leading slash -->
+    <mvc:view-controller path="/" view-name="login" />
+    <mvc:view-controller path="/login" />
+    <mvc:view-controller path="/signup" />
+    <mvc:view-controller path="/t/home" view-name="home" />
+    <mvc:view-controller path="/t/searchresult" view-name="searchresult" />
+
+    <!-- Configures the Tiles layout system -->
+    <bean id="tilesConfigurer" class="org.springframework.web.servlet.view.tiles2.TilesConfigurer">
+        <property name="definitions">
+            <list>
+                <value>/WEB-INF/tiles.xml</value>
+            </list>
+        </property>
+    </bean>
 </beans>
