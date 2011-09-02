@@ -39,7 +39,7 @@
         });
         $("#j_username").blur(function() {
             var usern = $("#j_username").val();
-            $.get("/exists?name=" + usern,
+            $.get("/exists?name=" + usern, { username:usern},
                 function(data) {
                     if (data) {
                         $("#checkname").text("User already exists with that name");
