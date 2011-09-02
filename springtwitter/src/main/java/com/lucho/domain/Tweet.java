@@ -6,12 +6,10 @@ import org.apache.solr.analysis.StandardTokenizerFactory;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.search.annotations.*;
+import org.hibernate.search.annotations.Parameter;
 import org.hibernate.validator.constraints.NotBlank;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
@@ -26,6 +24,7 @@ import java.util.Date;
 @Entity
 @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 @Indexed
+@Table(name="t_tweet")
 @AnalyzerDef(name = "da_analyzer",
         tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
         filters = {

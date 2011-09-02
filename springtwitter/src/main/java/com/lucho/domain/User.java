@@ -21,7 +21,7 @@ import java.util.List;
  */
 @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 @Entity
-@Table(name="user",
+@Table(name="t_user",
     uniqueConstraints = {@UniqueConstraint(columnNames={"username"})}
 )
 public class User implements UserDetails {
@@ -33,7 +33,7 @@ public class User implements UserDetails {
     @NotNull
     @NotBlank
     @Size(max = 32)
-    @Column(name = "username", unique=true)
+    @Column(name = "username")
     private String username;
 
     @NotNull
