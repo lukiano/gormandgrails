@@ -13,6 +13,7 @@
         <atomikos.version>3.7.0</atomikos.version>
         <tiles.version>2.2.2</tiles.version>
         <slf4j.version>1.6.2</slf4j.version>
+        <jackson.version>1.8.5</jackson.version>
     </properties>
     <dependencies>
         <dependency>
@@ -208,6 +209,26 @@
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc14</artifactId>
             <version>10.2.0.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-xc</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-jaxrs</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
     </dependencies>
     <repositories>
