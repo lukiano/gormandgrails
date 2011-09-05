@@ -17,7 +17,7 @@
             Reason: <%= ((AuthenticationException) session.getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION)).getMessage() %>
         </div>
     </c:if>
-    <form name="f" action="<c:url value="/loginProcess" />" method="post">
+    <form name="f" action="<c:url value="/spring_security_login" />" method="post">
         <fieldset>
             <legend>Login Information</legend>
             <p>
