@@ -5,11 +5,15 @@ import com.lucho.domain.User;
 import com.lucho.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
 
 @Service("userService")
 public class UserServiceImpl implements UserDetailsService, UserService {
@@ -27,12 +31,18 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException {
+    public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException, DataAccessException {
         User user = this.getUser(username);
         if (user == null) {
             throw new UsernameNotFoundException("User " + username + " not found.");
         }
+        this.addAuthority(user);
         return user;
+    }
+
+    private void addAuthority(final User user) {
+        GrantedAuthority gai = new GrantedAuthorityImpl("ROLE_USER");
+        user.setAuthorities(Collections.singletonList(gai));
     }
 
     @Override

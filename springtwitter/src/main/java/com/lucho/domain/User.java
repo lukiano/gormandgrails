@@ -66,7 +66,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<GrantedAuthority> getAuthorities() {
-        return this.authorities;  //To change body of implemented methods use File | Settings | File Templates.
+        return this.authorities;
     }
 
     public String getPassword() {
