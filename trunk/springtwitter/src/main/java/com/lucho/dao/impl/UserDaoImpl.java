@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class UserDaoImpl implements UserDao {
         Session session = this.getSessionFactory().getCurrentSession();
         Query query = session.createQuery("select count(*) from User where username = :name");
         query.setString("name", username);
-        Integer count = (Integer) query.uniqueResult();
+        Long count = (Long) query.uniqueResult();
         return count.intValue() == 1;
     }
 
@@ -54,7 +55,14 @@ public class UserDaoImpl implements UserDao {
         user.setPassword(password);
         Session session = this.getSessionFactory().getCurrentSession();
         session.persist(user);
-        user.getFollowedBy().add(user);
+        List<User> followedBy = user.getFollowedBy();
+        if (followedBy == null) {
+            followedBy = new ArrayList<User>();
+            followedBy.add(user);
+            user.setFollows(followedBy);
+        } else {
+            followedBy.add(user);
+        }
         user = (User) session.merge(user);
         return user;
     }

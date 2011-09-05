@@ -34,11 +34,7 @@ public class LoginController {
     public
     @ResponseBody
     Boolean register(final String username, final String password) {
-        if (!this.getUserService().userExists(username)) {
-            this.getUserService().addUser(username, password);
-            return true;
-        }
-        return false;
+        return this.getUserService().addUser(username, password) != null;
     }
 
     @RequestMapping(value = "/exists", method = RequestMethod.GET)
