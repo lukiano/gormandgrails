@@ -56,6 +56,9 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     @Override
     @Transactional
     public User addUser(final String username, final String password) {
+        if (this.getUserDao().userExists(username)) {
+            return null;
+        }
         return this.getUserDao().addUser(username, password);
     }
 
