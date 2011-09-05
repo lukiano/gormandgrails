@@ -7,10 +7,10 @@
 
     <definition name="login" template="/WEB-INF/login.jsp"/>
 
-    <definition name="signup" template="/WEB-INF/signup.jsp"/>
+    <definition name="signup" template="/WEB-INF/signup.html"/>
 
     <definition name="searchresult" template="/WEB-INF/searchresult.jsp"/>
 
-    <definition name="home" template="/WEB-INF/home.jsp"/>
+    <definition name="home" template="/WEB-INF/home.html"/>
 
 </tiles-definitions>
