@@ -3,6 +3,7 @@ package com.lucho.service.impl;
 import com.lucho.dao.UserDao;
 import com.lucho.domain.User;
 import com.lucho.service.UserService;
+import org.infinispan.util.concurrent.ConcurrentHashSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,9 +15,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.List;
 
 @Service("userService")
 public class UserServiceImpl implements UserDetailsService, UserService {
+
+    private ConcurrentHashSet<Integer> usersToBeRefreshed = new ConcurrentHashSet<Integer>();
 
     private UserDao userDao;
 
@@ -75,7 +79,24 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     @Override
     @Transactional
     public void followUser(final User user, final User userToFollow) {
-        this.getUserDao().followUser(user, userToFollow);
+        if (!this.getUserDao().isFollowedBy(user, userToFollow)) {
+            this.getUserDao().followUser(user, userToFollow);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void refreshFollowersFor(Integer ownerId) {
+        User user = this.getUserDao().getUser(ownerId);
+        List<User> followedByList = user.getFollowedBy();
+        for (User follower : followedByList) {
+               usersToBeRefreshed.add(follower.getId());
+        }
+    }
+
+    @Override
+    public boolean shouldRefresh(User user) {
+        return usersToBeRefreshed.remove(user.getId());
     }
 
 }

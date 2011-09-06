@@ -5,19 +5,10 @@ import com.lucho.domain.User;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.util.CollectionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -72,14 +63,27 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Autowired
-    public void setSessionFactory(SessionFactory sessionFactory) {
+    public void setSessionFactory(final SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
+    }
+
+    @Override
+    public boolean isFollowedBy(final User user, final User userToFollow) {
+        Session session = this.getSessionFactory().getCurrentSession();
+        Query query = session.createQuery("select count(*) from User user inner join user.followedBy followed where user.id = :userToFollowId and followed.id = :userId");
+        query.setParameter("userToFollowId", userToFollow.getId());
+        query.setParameter("userId", user.getId());
+        Long count = (Long) query.uniqueResult();
+        return count.intValue() == 1;
     }
 
     @Override
     public void followUser(User user, User userToFollow) {
         Session session = this.getSessionFactory().getCurrentSession();
-        userToFollow.getFollowedBy().add(user);
+        user = (User) session.merge(user);
+        userToFollow = (User) session.merge(userToFollow);
+        List<User> followedBy = userToFollow.getFollowedBy();
+        followedBy.add(user);
         session.merge(userToFollow);
     }
 }

@@ -9,6 +9,10 @@
         <webroots>
           <root url="file://$MODULE_DIR$/src/main/webapp" relative="/" />
         </webroots>
+        <sourceRoots>
+          <root url="file://$MODULE_DIR$/src/main/java" />
+          <root url="file://$MODULE_DIR$/src/main/resources" />
+        </sourceRoots>
       </configuration>
     </facet>
     <facet type="Spring" name="Spring">
@@ -17,7 +21,7 @@
     <facet type="hibernate" name="Hibernate">
       <configuration>
         <datasource-map>
-          <unit-entry name="sessionFactory" value="3ce4603c-1b8a-4651-8a67-8ab5eb39c129" />
+          <unit-entry name="sessionFactory" value="79148825-9836-4b89-a756-6e3698db836d" />
         </datasource-map>
         <deploymentDescriptor name="hibernate.cfg.xml" url="file://$MODULE_DIR$/src/main/webapp/WEB-INF/tweeter-servlet.xml" />
       </configuration>
@@ -75,8 +79,12 @@
     <orderEntry type="library" name="Maven: org.rhq.helpers:rhq-pluginAnnotations:3.0.1" level="project" />
     <orderEntry type="library" name="Maven: org.hibernate:hibernate-testing:3.6.7.Final" level="project" />
     <orderEntry type="library" name="Maven: junit:junit:3.8.1" level="project" />
-    <orderEntry type="library" name="Maven: org.hibernate:hibernate-validator:4.2.0.Final" level="project" />
-    <orderEntry type="library" name="Maven: javax.validation:validation-api:1.0.0.GA" level="project" />
+    <orderEntry type="library" name="Maven: org.hibernate:hibernate-validator:4.0.0.Beta2" level="project" />
+    <orderEntry type="library" name="Maven: javax.validation:validation-api:1.0.CR3" level="project" />
+    <orderEntry type="library" name="Maven: javax.xml.bind:jaxb-api:2.1" level="project" />
+    <orderEntry type="library" name="Maven: javax.xml.stream:stax-api:1.0-2" level="project" />
+    <orderEntry type="library" name="Maven: javax.activation:activation:1.1" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.xml.bind:jaxb-impl:2.1.3" level="project" />
     <orderEntry type="library" name="Maven: org.hibernate:hibernate-search:3.4.1.Final" level="project" />
     <orderEntry type="library" name="Maven: org.hibernate:hibernate-search-analyzers:3.4.1.Final" level="project" />
     <orderEntry type="library" name="Maven: org.apache.lucene:lucene-core:3.1.0" level="project" />

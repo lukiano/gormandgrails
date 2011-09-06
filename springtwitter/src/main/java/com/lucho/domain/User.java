@@ -3,7 +3,7 @@ package com.lucho.domain;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validation.constraints.NotEmpty;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -13,13 +13,6 @@ import javax.validation.constraints.Size;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * Created by IntelliJ IDEA.
- * User: lucianol
- * Date: 8/29/11
- * Time: 12:39 PM
- * To change this template use File | Settings | File Templates.
- */
 @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 @Entity
 @Table(name="t_user",
@@ -29,17 +22,19 @@ public class User implements UserDetails {
 
     @Id
     @GeneratedValue
+    @JsonIgnore
     private Integer id;
 
     @NotNull
-    @NotBlank
+    @NotEmpty
     @Size(max = 32)
     @Column(name = "username")
     private String username;
 
     @NotNull
-    @NotBlank
+    @NotEmpty
     @Size(min = 6, max = 32)
+    @JsonIgnore
     private String password;
 
     @OneToMany
@@ -47,7 +42,11 @@ public class User implements UserDetails {
     private List<User> followedBy;
 
     @Transient
+    @JsonIgnore
     private List<GrantedAuthority> authorities;
+
+    @Transient
+    private boolean beingFollowed;
 
     public Integer getId() {
         return id;
@@ -110,5 +109,13 @@ public class User implements UserDetails {
 
     public void setAuthorities(List<GrantedAuthority> authorities) {
         this.authorities = authorities;
+    }
+
+    public boolean isBeingFollowed() {
+        return beingFollowed;
+    }
+
+    public void setBeingFollowed(boolean beingFollowed) {
+        this.beingFollowed = beingFollowed;
     }
 }

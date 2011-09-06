@@ -10,19 +10,11 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by IntelliJ IDEA.
- * User: lucianol
- * Date: 8/30/11
- * Time: 10:18 AM
- * To change this template use File | Settings | File Templates.
- */
 @Repository
 public class TweetDaoImpl implements TweetDao {
 
@@ -31,18 +23,21 @@ public class TweetDaoImpl implements TweetDao {
     private SessionFactory sessionFactory;
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<Tweet> getTweetsForUser(final User user) {
         Session session = this.getSessionFactory().getCurrentSession();
-        Query query = session.createQuery("from Tweet where owner = :user");
-        query.setParameter("user", user);
+        Query query = session.createQuery("from Tweet where owner.id = :userId");
+        query.setParameter("userId", user.getId());
         query.setMaxResults(MAX_RESULTS);
         return query.list();
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<Tweet> getTweetsForUserIncludingFollows(final User user) {
         Session session = this.getSessionFactory().getCurrentSession();
-        Query query = session.createQuery("from Tweet where owner.followedBy = :user");
+        Query query = session.createQuery("from Tweet tweet inner join tweet.owner.followedBy followed where followed.id = :userId");
+        query.setParameter("userId", user.getId());
         query.setMaxResults(MAX_RESULTS);
         return query.list();
     }
@@ -59,6 +54,7 @@ public class TweetDaoImpl implements TweetDao {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<Tweet> searchTweets(final String textToSearch) {
         Session session = this.getSessionFactory().getCurrentSession();
         FullTextSession fullTextSession = Search.getFullTextSession(session);
