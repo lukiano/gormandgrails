@@ -3,24 +3,19 @@ package com.lucho.domain;
 import org.apache.solr.analysis.LowerCaseFilterFactory;
 import org.apache.solr.analysis.SnowballPorterFilterFactory;
 import org.apache.solr.analysis.StandardTokenizerFactory;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.search.annotations.*;
 import org.hibernate.search.annotations.Parameter;
-import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validation.constraints.NotEmpty;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
-/**
- * Created by IntelliJ IDEA.
- * User: lucianol
- * Date: 8/30/11
- * Time: 9:36 AM
- * To change this template use File | Settings | File Templates.
- */
 @Entity
 @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 @Indexed
@@ -38,10 +33,11 @@ public class Tweet {
 
     @Id
     @GeneratedValue
+    @JsonIgnore
     private Integer id;
 
     @NotNull
-    @NotBlank
+    @NotEmpty
     @Size(max = 140)
     @Field(index = Index.TOKENIZED, store = Store.NO)
     @Analyzer(definition = "da_analyzer")
@@ -52,7 +48,8 @@ public class Tweet {
     private User owner;
 
     @NotNull
-    @NotBlank
+    @NotEmpty
+    @Past
     private Date creationDate;
 
     public Date getCreationDate() {

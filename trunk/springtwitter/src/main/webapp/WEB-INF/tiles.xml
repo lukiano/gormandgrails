@@ -9,8 +9,6 @@
 
     <definition name="signup" template="/WEB-INF/signup.html"/>
 
-    <definition name="searchresult" template="/WEB-INF/searchresult.jsp"/>
-
     <definition name="home" template="/WEB-INF/home.html"/>
 
 </tiles-definitions>
