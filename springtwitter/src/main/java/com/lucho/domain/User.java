@@ -1,5 +1,6 @@
 package com.lucho.domain;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.validator.constraints.NotBlank;
@@ -42,6 +43,7 @@ public class User implements UserDetails {
     private String password;
 
     @OneToMany
+    @JsonIgnore
     private List<User> followedBy;
 
     @Transient

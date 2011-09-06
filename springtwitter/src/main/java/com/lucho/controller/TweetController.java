@@ -5,6 +5,7 @@ import com.lucho.domain.User;
 import com.lucho.service.TweetService;
 import com.lucho.service.TwitterMessageListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -48,13 +49,13 @@ public class TweetController {
 
     @RequestMapping(value = "/t/new", method = RequestMethod.POST)
     public void newTweet(final Principal principal, final String tweet) {
-        User user = null;
+        User user = this.getUser(principal);
         this.getTweetService().newTweet(user, tweet);
     }
 
     @RequestMapping(value = "/t/search", method = RequestMethod.GET)
     public List<Tweet> searchInTweets(final Principal principal, final String text) {
-        User user = null;
+        User user = this.getUser(principal);
         return this.getTweetService().searchTweets(text);
     }
 
@@ -62,16 +63,20 @@ public class TweetController {
     public
     @ResponseBody
     List<Tweet> getTweets(final Principal principal) {
-        principal.getName();
-        User user = null;
+        User user = this.getUser(principal);
         return this.getTweetService().getTweetsForUser(user);
+    }
+
+    private User getUser(final Principal principal) {
+        Authentication authentication = (Authentication) principal;
+        return (User) authentication.getPrincipal();
     }
 
     @RequestMapping(value = "/t/shouldrefresh", method = RequestMethod.GET)
     public
     @ResponseBody
     Boolean shouldrefresh(final Principal principal) {
-        User user = null;
+        User user = this.getUser(principal);
         return this.getTwitterMessageListener().getUsersToBeRefreshed().contains(user.getId());
     }
 }
