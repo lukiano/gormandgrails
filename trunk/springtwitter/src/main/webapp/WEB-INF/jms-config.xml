@@ -36,15 +36,12 @@
         <property name="xaConnectionFactory" ref="xaFactory"/>
     </bean>
 
-
     <!--
          Where do we send updated time table info to?
          Note: this is a topic to allow multiple subscribers.
     -->
     <bean id="topic" class="org.apache.activemq.command.ActiveMQTopic">
-        <property name="physicalName">
-            <value>DATOPIC</value>
-        </property>
+        <property name="physicalName" value="DATOPIC" />
     </bean>
 
 
@@ -52,31 +49,28 @@
 
     <!--
          a kind of message listener pool that will listen to
-         messages posted to 'requestQueue' with 3 threads,
+         messages posted to 'DATOPIC' with 3 threads,
          each one consuming a connection from bean 'ConnectionFactory'
     -->
-    <bean id="MessageListenerContainer"
+    <bean id="messageListenerContainer"
           class="org.springframework.jms.listener.DefaultMessageListenerContainer"
-          depends-on="AtomikosTransactionManager">
+          depends-on="atomikosTransactionManager">
         <property name="transactionManager" ref="transactionManager"/>
         <property name="connectionFactory" ref="connectionFactory"/>
         <property name="messageListener" ref="messageListener"/>
-        <property name="destinationName" value="requestQueue"/>
+        <property name="destinationName" value="DATOPIC"/>
         <property name="concurrentConsumers" value="1"/>
         <property name="receiveTimeout" value="3000"/>
         <property name="sessionTransacted" value="true"/>
     </bean>
+
     <!--
       JMS template for easy sending of timetable update messages with Spring
     -->
     <bean id="jmsTemplate"
           class="org.springframework.jms.core.JmsTemplate">
-        <property name="connectionFactory">
-            <ref bean="connectionFactory"/>
-        </property>
-        <property name="defaultDestination">
-            <ref bean="topic"/>
-        </property>
+        <property name="connectionFactory" ref="connectionFactory" />
+        <property name="defaultDestination" ref="topic" />
         <property name="receiveTimeout" value="1000"/>
         <property name="sessionTransacted" value="true"/>
     </bean>

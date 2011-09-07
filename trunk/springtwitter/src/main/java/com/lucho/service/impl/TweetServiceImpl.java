@@ -18,13 +18,9 @@ import javax.jms.Session;
 import java.util.List;
 
 @Service
-public class TweetServiceImpl implements TweetService {
+public final class TweetServiceImpl implements TweetService {
 
     private TweetDao tweetDao;
-
-    public JmsTemplate getJmsTemplate() {
-        return jmsTemplate;
-    }
 
     @Autowired
     public void setJmsTemplate(final JmsTemplate jmsTemplate) {
@@ -44,10 +40,6 @@ public class TweetServiceImpl implements TweetService {
         return tweetList;
     }
 
-    public TweetDao getTweetDao() {
-        return this.tweetDao;
-    }
-
     @Autowired
     public void setTweetDao(final TweetDao tweetDao) {
         this.tweetDao = tweetDao;
@@ -57,22 +49,22 @@ public class TweetServiceImpl implements TweetService {
     @Transactional
     @Secured("ROLE_USER")
     public Tweet newTweet(final User user, final String text) {
-        Tweet newTweet = this.getTweetDao().newTweet(user, text);
-        //newTweet.getOwner().setBeingFollowed(true);
-        //this.sendMessage(newTweet);
+        Tweet newTweet = this.tweetDao.newTweet(user, text);
+        newTweet.getOwner().setBeingFollowed(true);
+        this.sendMessage(newTweet);
         return newTweet;
     }
 
     private void sendMessage(final Tweet newTweet) {
         MessageCreator messageCreator = new TweetMessageCreator(newTweet);
-        this.getJmsTemplate().send(messageCreator);
+        this.jmsTemplate.send(messageCreator);
     }
 
     @Override
     @Transactional(readOnly = true)
     @Secured("ROLE_USER")
     public List<Tweet> searchTweets(final User user, final String textToSearch) {
-        List<Tweet> tweetList =  this.getTweetDao().searchTweets(textToSearch);
+        List<Tweet> tweetList =  this.tweetDao.searchTweets(textToSearch);
         for (Tweet tweet : tweetList) {
             boolean followed = tweet.getOwner().getFollowedBy().contains(user);
             tweet.getOwner().setBeingFollowed(followed);
@@ -82,7 +74,7 @@ public class TweetServiceImpl implements TweetService {
 
     private static class TweetMessageCreator implements MessageCreator {
 
-        private Tweet tweet;
+        private final Tweet tweet;
 
         public TweetMessageCreator(final Tweet tweet) {
             this.tweet = tweet;

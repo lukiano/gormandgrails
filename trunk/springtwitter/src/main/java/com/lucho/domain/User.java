@@ -3,7 +3,7 @@ package com.lucho.domain;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.validation.constraints.NotEmpty;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -18,7 +18,11 @@ import java.util.List;
 @Table(name="t_user",
     uniqueConstraints = {@UniqueConstraint(columnNames={"username"})}
 )
-public class User implements UserDetails {
+public final class User implements UserDetails, Identifiable {
+
+    private static final int MAX_USER_LENGTH = 32;
+    private static final int MAX_PASSWORD_LENGTH = 32;
+    private static final int MIN_PASSWORD_LENGTH = 6;
 
     @Id
     @GeneratedValue
@@ -27,13 +31,13 @@ public class User implements UserDetails {
 
     @NotNull
     @NotEmpty
-    @Size(max = 32)
+    @Size(max = MAX_USER_LENGTH)
     @Column(name = "username")
     private String username;
 
     @NotNull
     @NotEmpty
-    @Size(min = 6, max = 32)
+    @Size(min = MIN_PASSWORD_LENGTH, max = MAX_PASSWORD_LENGTH)
     @JsonIgnore
     private String password;
 
@@ -48,6 +52,8 @@ public class User implements UserDetails {
     @Transient
     private boolean beingFollowed;
 
+    @Override
+    @JsonIgnore
     public Integer getId() {
         return id;
     }
@@ -66,31 +72,37 @@ public class User implements UserDetails {
     }
 
     @Override
+    @JsonIgnore
     public Collection<GrantedAuthority> getAuthorities() {
         return this.authorities;
     }
 
+    @JsonIgnore
     public String getPassword() {
         return password;
     }
 
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonExpired() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonLocked() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isEnabled() {
         return true;
     }
@@ -99,6 +111,7 @@ public class User implements UserDetails {
         this.password = password;
     }
 
+    @JsonIgnore
     public List<User> getFollowedBy() {
         return followedBy;
     }

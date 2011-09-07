@@ -5,7 +5,6 @@ import com.lucho.domain.User;
 import com.lucho.service.UserService;
 import org.infinispan.util.concurrent.ConcurrentHashSet;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,15 +17,11 @@ import java.util.Collections;
 import java.util.List;
 
 @Service("userService")
-public class UserServiceImpl implements UserDetailsService, UserService {
+public final class UserServiceImpl implements UserDetailsService, UserService {
 
-    private ConcurrentHashSet<Integer> usersToBeRefreshed = new ConcurrentHashSet<Integer>();
+    private final ConcurrentHashSet<Integer> usersToBeRefreshed = new ConcurrentHashSet<Integer>();
 
     private UserDao userDao;
-
-    public UserDao getUserDao() {
-        return userDao;
-    }
 
     @Autowired
     public void setUserDao(final UserDao userDao) {
@@ -35,59 +30,55 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException, DataAccessException {
+    public UserDetails loadUserByUsername(final String username) {
         User user = this.getUser(username);
         if (user == null) {
             throw new UsernameNotFoundException("User " + username + " not found.");
         }
-        this.addAuthority(user);
-        return user;
-    }
-
-    private void addAuthority(final User user) {
         GrantedAuthority gai = new GrantedAuthorityImpl("ROLE_USER");
         user.setAuthorities(Collections.singletonList(gai));
+        return user;
     }
 
     @Override
     @Transactional(readOnly = true)
     public User getUser(final Integer id) {
-        return this.getUserDao().getUser(id);
+        return this.userDao.getUser(id);
     }
 
     @Override
     @Transactional(readOnly = true)
     public User getUser(String username) {
-        return this.getUserDao().getUser(username);
+        return this.userDao.getUser(username);
     }
 
     @Override
     @Transactional(readOnly = true)
     public boolean userExists(final String username) {
-        return this.getUserDao().userExists(username);
+        return this.userDao.userExists(username);
     }
 
     @Override
     @Transactional
     public User addUser(final String username, final String password) {
-        if (this.getUserDao().userExists(username)) {
+        if (this.userDao.userExists(username)) {
             return null;
         }
-        return this.getUserDao().addUser(username, password);
+        return this.userDao.addUser(username, password);
     }
 
     @Override
     @Transactional
     public void followUser(final User user, final User userToFollow) {
-        if (!this.getUserDao().isFollowedBy(user, userToFollow)) {
-            this.getUserDao().followUser(user, userToFollow);
+        if (this.userDao.notFollowedBy(user, userToFollow)) {
+            this.userDao.followUser(user, userToFollow);
         }
     }
 
     @Override
     @Transactional
     public void refreshFollowersFor(Integer ownerId) {
-        User user = this.getUserDao().getUser(ownerId);
+        User user = this.userDao.getUser(ownerId);
         List<User> followedByList = user.getFollowedBy();
         for (User follower : followedByList) {
                usersToBeRefreshed.add(follower.getId());
