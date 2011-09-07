@@ -20,9 +20,7 @@
           class="com.atomikos.jdbc.AtomikosDataSourceBean"
           init-method="init" destroy-method="close">
         <!-- set an arbitrary but unique name for the datasource -->
-        <property name="uniqueResourceName">
-            <value>XADBMS</value>
-        </property>
+        <property name="uniqueResourceName" value="XADBMS" />
         <property name="maxPoolSize" value="50"/>
         <property name="minPoolSize" value="5"/>
         <!--
@@ -43,9 +41,7 @@
              IMPORTANT: make sure to refer to an ATOMIKOS
              JTA/XA datasource for the sessionFactory!
         -->
-        <property name="dataSource">
-            <ref bean="datasource"/>
-        </property>
+        <property name="dataSource" ref="datasource" />
         <property name="annotatedClasses">
             <list>
                 <value>com.lucho.domain.User</value>
@@ -91,9 +87,7 @@
     -->
     <bean id="hibernateTemplate"
           class="org.springframework.orm.hibernate3.HibernateTemplate">
-        <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
-        </property>
+        <property name="sessionFactory" ref="sessionFactory" />
     </bean>
 
 </beans>

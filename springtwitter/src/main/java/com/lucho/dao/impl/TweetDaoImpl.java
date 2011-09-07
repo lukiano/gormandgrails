@@ -9,14 +9,14 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
 import java.util.List;
 
 @Repository
-public class TweetDaoImpl implements TweetDao {
+final class TweetDaoImpl implements TweetDao {
 
     private static final int MAX_RESULTS = 20;
 
@@ -25,7 +25,7 @@ public class TweetDaoImpl implements TweetDao {
     @Override
     @SuppressWarnings("unchecked")
     public List<Tweet> getTweetsForUser(final User user) {
-        Session session = this.getSessionFactory().getCurrentSession();
+        Session session = this.sessionFactory.getCurrentSession();
         Query query = session.createQuery("from Tweet where owner.id = :userId");
         query.setParameter("userId", user.getId());
         query.setMaxResults(MAX_RESULTS);
@@ -35,8 +35,8 @@ public class TweetDaoImpl implements TweetDao {
     @Override
     @SuppressWarnings("unchecked")
     public List<Tweet> getTweetsForUserIncludingFollows(final User user) {
-        Session session = this.getSessionFactory().getCurrentSession();
-        Query query = session.createQuery("from Tweet tweet inner join tweet.owner.followedBy followed where followed.id = :userId");
+        Session session = this.sessionFactory.getCurrentSession();
+        Query query = session.createQuery("select tweet from Tweet tweet inner join tweet.owner.followedBy followed where followed.id = :userId");
         query.setParameter("userId", user.getId());
         query.setMaxResults(MAX_RESULTS);
         return query.list();
@@ -47,8 +47,8 @@ public class TweetDaoImpl implements TweetDao {
         Tweet tweet = new Tweet();
         tweet.setOwner(user);
         tweet.setTweet(text);
-        tweet.setCreationDate(new Date());
-        Session session = this.getSessionFactory().getCurrentSession();
+        tweet.setCreationDate(new DateTime());
+        Session session = this.sessionFactory.getCurrentSession();
         session.persist(tweet);
         return tweet;
     }
@@ -56,7 +56,7 @@ public class TweetDaoImpl implements TweetDao {
     @Override
     @SuppressWarnings("unchecked")
     public List<Tweet> searchTweets(final String textToSearch) {
-        Session session = this.getSessionFactory().getCurrentSession();
+        Session session = this.sessionFactory.getCurrentSession();
         FullTextSession fullTextSession = Search.getFullTextSession(session);
 
         // create native Lucene query unsing the query DSL
@@ -71,10 +71,6 @@ public class TweetDaoImpl implements TweetDao {
         Query query =fullTextSession.createFullTextQuery(lQuery, Tweet.class);
         query.setMaxResults(MAX_RESULTS);
         return query.list();
-    }
-
-    public SessionFactory getSessionFactory() {
-        return sessionFactory;
     }
 
     @Autowired

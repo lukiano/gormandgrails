@@ -12,7 +12,7 @@ public interface UserDao {
 
     User addUser(String username, String password);
 
-    boolean isFollowedBy(User user, User userToFollow);
+    boolean notFollowedBy(User user, User userToFollow);
 
     void followUser(User user, User userToFollow);
 }

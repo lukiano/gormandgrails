@@ -5,7 +5,7 @@ import org.springframework.security.core.Authentication;
 
 import java.security.Principal;
 
-public final class Helper {
+final class Helper {
 
     private Helper() {
     }

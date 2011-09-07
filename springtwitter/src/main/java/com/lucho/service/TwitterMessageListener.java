@@ -9,11 +9,7 @@ import javax.jms.MapMessage;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 
-public class TwitterMessageListener implements MessageListener {
-
-    public UserService getUserService() {
-        return userService;
-    }
+public final class TwitterMessageListener implements MessageListener {
 
     @Autowired
     public void setUserService(UserService userService) {
@@ -22,7 +18,7 @@ public class TwitterMessageListener implements MessageListener {
 
     private UserService userService;
 
-    private static Logger logger = LoggerFactory.getLogger(TwitterMessageListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TwitterMessageListener.class);
 
 
     @Override
@@ -32,9 +28,9 @@ public class TwitterMessageListener implements MessageListener {
         try {
             ownerId = mapMessage.getInt("owner");
         } catch (JMSException e) {
-            logger.error("While processing message", e);
+            LOGGER.error("While processing message", e);
             return;
         }
-        this.getUserService().refreshFollowersFor(ownerId);
+        this.userService.refreshFollowersFor(ownerId);
     }
 }

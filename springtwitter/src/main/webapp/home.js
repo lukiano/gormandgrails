@@ -2,8 +2,8 @@ function getTweetCallback(data) {
     if (data) {
         var tweetLine = $("#tweetLine");
         tweetLine.empty();
-        for (var i = 0; i < data.tweet.length; i++) {
-            var tweet = data.tweet[i];
+        for (var i = 0; i < data.length; i++) {
+            var tweet = data[i];
             tweetLine.append(buildHtml(tweet));
         }
     }
@@ -16,21 +16,25 @@ function getTweets() {
 function newTweetCallback(data) {
     if (data) {
         var tweetLine = $("#tweetLine");
-        tweetLine.prepend(buildHtml(tweet));
+        tweetLine.prepend(buildHtml(data));
+        var ntt = $("#newTweetText");
+        ntt.empty();
     }
 }
 
 function newTweet() {
-    var tweet = $.trim($("#newTweetText").val());
+    var ntt = $("#newTweetText");
+    var tweet = $.trim(ntt.val());
     if (tweet) {
         $.post("/t/new", {tweet: tweet}, newTweetCallback, 'json');
     }
 }
 
 function searchText() {
-    var tweet = $.trim($("#newTweetText").val());
-    if (tweet) {
-        $.post("/t/search", {tweet: tweet}, searchTextCallback, 'json');
+    var tts = $("#textToSearch");
+    var text = $.trim(tts.val());
+    if (text) {
+        $.get("/t/search?text=" + text, null, searchTextCallback, 'json');
     }
 }
 
@@ -38,19 +42,21 @@ function searchTextCallback(data) {
     if (data) {
         var tweetLine = $("#tweetLine");
         tweetLine.empty();
-        for (var i = 0; i < data.tweet.length; i++) {
-            var tweet = data.tweet[i];
+        for (var i = 0; i < data.length; i++) {
+            var tweet = data[i];
             tweetLine.append(buildHtml(tweet));
         }
+        var tts = $("#textToSearch");
+        tts.empty();
     }
 }
 
 function buildHtml(tweet) {
     var html;
     if (tweet.owner.beingFollowed) {
-        html = "<span><p>User: " + tweet.owner.username + " - Creation date: " + tweet.creationDate + "</p><p>" + tweet.tweet + "</p></span>";
+        html = "<span><p>User: " + tweet.owner.username + " - Creation date: " + tweet.creationDate + "</p><p>" + tweet.tweet + "</p></span><hr/>";
     } else {
-        html = "<span><p>User: <a href='/t/follow?name=" + tweet.owner.username + "'>" + tweet.owner.username + "</a> - Creation date: " + tweet.creationDate + "</p><p>" + tweet.tweet + "</p></span>";
+        html = "<span><p>User: <a href='/t/follow?name=" + tweet.owner.username + "'>" + tweet.owner.username + "</a> - Creation date: " + tweet.creationDate + "</p><p>" + tweet.tweet + "</p></span><hr/>";
     }
     return html
 }
@@ -78,8 +84,6 @@ function ready() {
         }
     });
     getTweets();
-    $(document).everyTime(1000, function(i) {
-        processChunk(i);
-    }, times);
+    setInterval(checkForNewTweets, 5000);
 }
 
