@@ -9,13 +9,21 @@
     <packaging>war</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>3.0.6.RELEASE</spring.version>
+        <spring.version>3.1.0.RC1</spring.version>                          <!-- 3.0.6.RELEASE -->
+        <spring.security.version>3.1.0.RC3</spring.security.version>
         <atomikos.version>3.7.0</atomikos.version>
         <tiles.version>2.2.2</tiles.version>
         <slf4j.version>1.6.2</slf4j.version>
-        <jackson.version>1.8.5</jackson.version>
+        <jackson.version>1.9.0</jackson.version>
+        <hibernate.version>4.0.0.CR4</hibernate.version>
+        <hibernate.search.version>4.0.0.CR1</hibernate.search.version>       <!-- 3.4.1.Final -->
+        <hibernate.validator.version>4.2.0.Final</hibernate.validator.version>
+        <infinispan.version>5.0.0.FINAL</infinispan.version>
+        <jaxb.version>2.2.4</jaxb.version>
     </properties>
     <dependencies>
+
+        <!-- Spring Framework -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
@@ -54,69 +62,81 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
-            <version>${spring.version}</version>
+            <version>${spring.security.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
-            <version>${spring.version}</version>
+            <version>${spring.security.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-config</artifactId>
-            <version>${spring.version}</version>
+            <version>${spring.security.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-taglibs</artifactId>
-            <version>${spring.version}</version>
+            <version>${spring.security.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.derby</groupId>
-            <artifactId>derby</artifactId>
-            <version>10.8.1.2</version>
-        </dependency>
+
+        <!-- Hibernate -->
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>3.6.7.Final</version>
+            <version>${hibernate.version}</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-infinispan</artifactId>
-            <version>3.6.7.Final</version>
+            <version>${hibernate.version}</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>4.2.0.Final</version>
-            <!-- <version>4.0.0.Beta2</version>-->
+            <version>${hibernate.validator.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator-annotation-processor</artifactId>
+            <version>${hibernate.validator.version}</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.jtype</groupId>
             <artifactId>jtype</artifactId>
             <version>0.1.2</version>
         </dependency>
+        <!-- Hibernate Search -->
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search</artifactId>
-            <version>3.4.1.Final</version>
+            <version>${hibernate.search.version}</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-infinispan</artifactId>
-            <version>3.4.1.Final</version>
+            <version>${hibernate.search.version}</version>
         </dependency>
+
+        <!-- Infinispan -->
         <dependency>
             <groupId>org.infinispan</groupId>
             <artifactId>infinispan-core</artifactId>
-            <version>5.0.0.FINAL</version>
+            <version>${infinispan.version}</version>
         </dependency>
         <dependency>
             <groupId>org.infinispan</groupId>
             <artifactId>infinispan-lucene-directory</artifactId>
-            <version>5.0.0.FINAL</version>
+            <version>${infinispan.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.lucene</groupId>
+                    <artifactId>lucene-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+
+        <!-- Atomikos Transactions -->
         <dependency>
             <groupId>com.atomikos</groupId>
             <artifactId>transactions</artifactId>
@@ -137,6 +157,8 @@
             <artifactId>transactions-hibernate3</artifactId>
             <version>${atomikos.version}</version>
         </dependency>
+
+        <!-- SLF4j logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -160,15 +182,31 @@
             <version>1.2.16</version>
             <scope>runtime</scope>
         </dependency>
+
+        <!-- ActiveMQ JMS -->
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-core</artifactId>
             <version>5.5.0</version>
         </dependency>
+
+        <!-- JAXB -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>${jaxb.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>${jaxb.version}</version>
+        </dependency>
+
+        <!-- Stuff -->
         <dependency>
             <groupId>org.apache.xbean</groupId>
             <artifactId>xbean-spring</artifactId>
-            <version>3.7</version>
+            <version>3.8</version>
         </dependency>
         <dependency>
             <groupId>javassist</groupId>
@@ -180,6 +218,13 @@
             <artifactId>cglib</artifactId>
             <version>2.2.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+
+        <!-- Tiles -->
         <dependency>
             <groupId>org.apache.tiles</groupId>
             <artifactId>tiles-core</artifactId>
@@ -200,6 +245,8 @@
             <artifactId>tiles-jsp</artifactId>
             <version>${tiles.version}</version>
         </dependency>
+
+        <!-- Servlet API -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
@@ -211,6 +258,13 @@
             <artifactId>jstl</artifactId>
             <version>1.2</version>
         </dependency>
+
+        <!-- Databases -->
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>10.8.1.2</version>
+        </dependency>
         <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc14</artifactId>
@@ -221,6 +275,13 @@
             <artifactId>jdbc</artifactId>
             <version>4.0.ctp2</version>
         </dependency>
+        <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.0-801.jdbc4</version>
+        </dependency>
+
+        <!-- Jackson JSON -->
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-core-asl</artifactId>
@@ -241,6 +302,8 @@
             <artifactId>jackson-jaxrs</artifactId>
             <version>${jackson.version}</version>
         </dependency>
+
+        <!-- Joda Time -->
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
@@ -256,11 +319,13 @@
             <artifactId>joda-convert</artifactId>
             <version>1.1</version>
         </dependency>
+
     </dependencies>
     <repositories>
         <repository>
             <id>jboss</id>
             <url>https://repository.jboss.org/nexus/content/groups/public/</url>
         </repository>
+
     </repositories>
 </project>
