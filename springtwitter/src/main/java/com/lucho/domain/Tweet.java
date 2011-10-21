@@ -42,7 +42,7 @@ public final class Tweet implements Identifiable {
     @NotNull
     @NotEmpty
     @Size(max = MAX_TWEET_LENGTH)
-    @Field(index = Index.TOKENIZED, store = Store.NO)
+    @Field(index = Index.YES, store = Store.NO)
     @Analyzer(definition = "da_analyzer")
     private String tweet;
 

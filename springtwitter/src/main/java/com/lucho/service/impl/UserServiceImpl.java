@@ -6,7 +6,7 @@ import com.lucho.service.UserService;
 import org.infinispan.util.concurrent.ConcurrentHashSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -35,7 +35,7 @@ public final class UserServiceImpl implements UserDetailsService, UserService {
         if (user == null) {
             throw new UsernameNotFoundException("User " + username + " not found.");
         }
-        GrantedAuthority gai = new GrantedAuthorityImpl("ROLE_USER");
+        GrantedAuthority gai = new SimpleGrantedAuthority("ROLE_USER");
         user.setAuthorities(Collections.singletonList(gai));
         return user;
     }
