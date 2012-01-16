@@ -4,9 +4,9 @@
        xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
         http://www.springframework.org/schema/util
-        http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+        http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 
     <bean id="placeholderConfig"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
@@ -35,17 +35,16 @@
     </bean>
 
     <bean id="sessionFactory"
-          class="org.springframework.orm.hibernate4.annotation.AnnotationSessionFactoryBean">
+          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
 
         <!--
              IMPORTANT: make sure to refer to an ATOMIKOS
              JTA/XA datasource for the sessionFactory!
         -->
         <property name="dataSource" ref="datasource" />
-        <property name="annotatedClasses">
+        <property name="packagesToScan">
             <list>
-                <value>com.lucho.domain.User</value>
-                <value>com.lucho.domain.Tweet</value>
+                <value>com.lucho.domain</value>
             </list>
         </property>
         <!-- IMPORTANT: make sure to tell Hibernate to use JTA -->
@@ -56,12 +55,14 @@
                 <!-- <prop key="hibernate.connection.isolation">3</prop>    -->
                 <prop key="hibernate.current_session_context_class">jta</prop>
                 <prop key="hibernate.id.new_generator_mappings">true</prop>
+                <!-- 
                 <prop key="hibernate.transaction.factory_class">
                     com.atomikos.icatch.jta.hibernate3.AtomikosJTATransactionFactory
                 </prop>
                 <prop key="hibernate.transaction.manager_lookup_class">
                     com.atomikos.icatch.jta.hibernate3.TransactionManagerLookup
                 </prop>
+                 -->
                 <prop key="hibernate.cache.use_second_level_cache">true</prop>
                 <prop key="hibernate.cache.use_query_cache">false</prop>
                 <prop key="hibernate.cache.region.factory_class">
@@ -79,15 +80,6 @@
             </props>
         </property>
 
-    </bean>
-
-    <!--
-         Configure the Hibernate template
-         with the resulting sessionFactory
-    -->
-    <bean id="hibernateTemplate"
-          class="org.springframework.orm.hibernate3.HibernateTemplate">
-        <property name="sessionFactory" ref="sessionFactory" />
     </bean>
 
 </beans>
