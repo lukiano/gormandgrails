@@ -20,7 +20,12 @@ import java.util.List;
 )
 public final class User implements UserDetails, Identifiable {
 
-    private static final int MAX_USER_LENGTH = 32;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5788883283199993395L;
+	
+	private static final int MAX_USER_LENGTH = 32;
     private static final int MAX_PASSWORD_LENGTH = 32;
     private static final int MIN_PASSWORD_LENGTH = 6;
 

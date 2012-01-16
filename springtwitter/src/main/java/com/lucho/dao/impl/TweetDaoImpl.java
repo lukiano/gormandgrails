@@ -1,45 +1,45 @@
 package com.lucho.dao.impl;
 
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.hibernate.search.jpa.FullTextEntityManager;
+import org.hibernate.search.jpa.Search;
+import org.hibernate.search.query.dsl.QueryBuilder;
+import org.joda.time.DateTime;
+import org.springframework.stereotype.Repository;
+
 import com.lucho.dao.TweetDao;
 import com.lucho.domain.Tweet;
 import com.lucho.domain.User;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
-import org.hibernate.search.query.dsl.QueryBuilder;
-import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 final class TweetDaoImpl implements TweetDao {
 
     private static final int MAX_RESULTS = 20;
 
-    private SessionFactory sessionFactory;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     @SuppressWarnings("unchecked")
     public List<Tweet> getTweetsForUser(final User user) {
-        Session session = this.sessionFactory.getCurrentSession();
-        Query query = session.createQuery("from Tweet where owner.id = :userId");
+    	Query query = this.entityManager.createQuery("from Tweet where owner.id = :userId");
         query.setParameter("userId", user.getId());
         query.setMaxResults(MAX_RESULTS);
-        return query.list();
+        return query.getResultList();
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<Tweet> getTweetsForUserIncludingFollows(final User user) {
-        Session session = this.sessionFactory.getCurrentSession();
-        Query query = session.createQuery("select tweet from Tweet tweet inner join tweet.owner.followedBy followed where followed.id = :userId");
+        Query query = this.entityManager.createQuery("select tweet from Tweet tweet inner join tweet.owner.followedBy followed where followed.id = :userId");
         query.setParameter("userId", user.getId());
         query.setMaxResults(MAX_RESULTS);
-        return query.list();
+        return query.getResultList();
     }
 
     @Override
@@ -48,33 +48,26 @@ final class TweetDaoImpl implements TweetDao {
         tweet.setOwner(user);
         tweet.setTweet(text);
         tweet.setCreationDate(new DateTime());
-        Session session = this.sessionFactory.getCurrentSession();
-        session.persist(tweet);
-        return tweet;
+        return this.entityManager.merge(tweet);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<Tweet> searchTweets(final String textToSearch) {
-        Session session = this.sessionFactory.getCurrentSession();
-        FullTextSession fullTextSession = Search.getFullTextSession(session);
+        FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
 
         // create native Lucene query unsing the query DSL
         // alternatively you can write the Lucene query using the Lucene query parser
         // or the Lucene programmatic API. The Hibernate Search DSL is recommended though
-        QueryBuilder qb = fullTextSession.getSearchFactory()
+        QueryBuilder qb = fullTextEntityManager.getSearchFactory()
                 .buildQueryBuilder().forEntity(Tweet.class).get();
         org.apache.lucene.search.Query lQuery = qb.keyword()
                 .onFields("tweet").matching(textToSearch).createQuery();
 
         // wrap Lucene query in a org.hibernate.Query
-        Query query =fullTextSession.createFullTextQuery(lQuery, Tweet.class);
+        Query query =fullTextEntityManager.createFullTextQuery(lQuery, Tweet.class);
         query.setMaxResults(MAX_RESULTS);
-        return query.list();
+        return query.getResultList();
     }
 
-    @Autowired
-    public void setSessionFactory(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
 }

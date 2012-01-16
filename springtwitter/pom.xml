@@ -11,11 +11,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.version>3.1.0.RELEASE</spring.version>                          <!-- 3.0.6.RELEASE -->
         <spring.security.version>3.1.0.RELEASE</spring.security.version>
+        <spring.integration.version>2.1.0.RELEASE</spring.integration.version>
         <atomikos.version>3.7.0</atomikos.version>
         <tiles.version>2.2.2</tiles.version>
         <slf4j.version>1.6.4</slf4j.version>
         <jackson.version>1.9.3</jackson.version>
-        <hibernate.version>4.0.0.Final</hibernate.version>
+        <hibernate.version>4.0.1.Final</hibernate.version>
         <hibernate.search.version>4.0.0.Final</hibernate.search.version>       <!-- 3.4.1.Final -->
         <hibernate.validator.version>4.2.0.Final</hibernate.validator.version>
         <infinispan.version>5.1.0.CR2</infinispan.version>
@@ -59,6 +60,12 @@
             <artifactId>spring-context-support</artifactId>
             <version>${spring.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.version}</version>
+            <scope>test</scope>
+        </dependency>
         
         <!-- Spring Security -->
         <dependency>
@@ -82,10 +89,37 @@
             <version>${spring.security.version}</version>
         </dependency>
         
+        <!-- Spring Data -->
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-jpa</artifactId>
             <version>1.0.2.RELEASE</version>
+        </dependency>
+        
+        <!-- Spring Integration -->
+        <dependency>
+        	<groupId>org.springframework.integration</groupId>
+        	<artifactId>spring-integration-jms</artifactId>
+        	<version>${spring.integration.version}</version>
+        </dependency>
+
+        <dependency>
+        	<groupId>org.springframework.integration</groupId>
+        	<artifactId>spring-integration-security</artifactId>
+        	<version>${spring.integration.version}</version>
+        </dependency>
+
+        <dependency>
+        	<groupId>org.springframework.integration</groupId>
+        	<artifactId>spring-integration-event</artifactId>
+        	<version>${spring.integration.version}</version>
+        </dependency>
+
+        <dependency>
+        	<groupId>org.springframework.integration</groupId>
+        	<artifactId>spring-integration-test</artifactId>
+        	<version>${spring.integration.version}</version>
+        	<scope>test</scope>
         </dependency>
 
         <!-- Hibernate -->
@@ -170,7 +204,7 @@
         </dependency>
         <dependency>
             <groupId>com.atomikos</groupId>
-            <artifactId>transactions-hibernate3</artifactId>
+            <artifactId>transactions-jdbc</artifactId>
             <version>${atomikos.version}</version>
         </dependency>
 
@@ -263,18 +297,26 @@
         </dependency>
 
         <!-- Servlet API -->
+        <!-- 
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>2.5</version>
             <scope>provided</scope>
         </dependency>
+ 		-->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
             <version>1.2</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.servlet</artifactId>
+            <version>3.0</version>
+            <scope>provided</scope>
+        </dependency>
+ 		
         <!-- Databases -->
         <dependency>
             <groupId>org.apache.derby</groupId>
