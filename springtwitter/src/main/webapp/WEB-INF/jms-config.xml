@@ -62,6 +62,7 @@
         <property name="concurrentConsumers" value="1"/>
         <property name="receiveTimeout" value="3000"/>
         <property name="sessionTransacted" value="true"/>
+        <property name="sessionAcknowledgeMode" value="0" />
     </bean>
 
     <!--
