@@ -2,15 +2,30 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xmlns:cache="http://www.springframework.org/schema/cache"
 	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:inf="http://www.infinispan.org/schemas/spring"
 	xsi:schemaLocation="
+				http://www.infinispan.org/schemas/spring http://www.infinispan.org/schemas/infinispan-spring-5.0.xsd
                 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
                 http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-3.1.xsd">
 
 	<cache:annotation-driven />
 
 	<!-- Infinispan cache manager -->
-	<bean id="cacheManager"
-		class="org.infinispan.spring.provider.SpringEmbeddedCacheManagerFactoryBean"
-		p:configurationFileLocation="classpath:/org/infinispan/spring/provider/sample/books-infinispan-config.xml" />
+	<bean id="infinispanCacheManager"
+		class="org.infinispan.spring.support.embedded.InfinispanEmbeddedCacheManagerFactoryBean"
+		p:configurationFileLocation="classpath:/infinispan.cfg.xml" />
 
+	<bean id="cacheManager"
+		class="org.infinispan.spring.provider.SpringEmbeddedCacheManager">
+		<constructor-arg ref="infinispanCacheManager" />
+		</bean>
+		
+	<!-- 
+	<inf:embedded-cache-manager configuration="classpath:/infinispan.cfg.xml"/>
+ 	-->
+	
+	<bean id="cacheManagerJNDI" class="com.lucho.util.JNDIExporter" depends-on="cacheManager">
+		<property name="objectToBind" ref="infinispanCacheManager" />
+		<property name="name" value="CacheManager" />
+	</bean>
 </beans>
