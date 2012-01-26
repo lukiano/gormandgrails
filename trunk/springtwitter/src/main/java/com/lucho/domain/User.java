@@ -18,7 +18,7 @@ import java.util.List;
 @Table(name="t_user",
     uniqueConstraints = {@UniqueConstraint(columnNames={"username"})}
 )
-public final class User implements UserDetails, Identifiable {
+public class User implements UserDetails, Identifiable {
 
     /**
 	 * 
@@ -48,6 +48,7 @@ public final class User implements UserDetails, Identifiable {
 
     @OneToMany
     @JsonIgnore
+    @Column(name = "t_user_id")
     private List<User> followedBy;
 
     @Transient

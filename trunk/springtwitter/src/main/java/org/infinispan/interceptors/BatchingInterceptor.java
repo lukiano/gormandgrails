@@ -9,6 +9,7 @@ import org.infinispan.interceptors.base.CommandInterceptor;
 import org.infinispan.util.logging.Log;
 import org.infinispan.util.logging.LogFactory;
 
+import javax.transaction.Status;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
@@ -49,15 +50,17 @@ public class BatchingInterceptor extends CommandInterceptor {
       // if in a batch, attach tx
       if (transactionManager.getTransaction() == null && (tx = batchContainer.getBatchTransaction()) != null) {
          try {
-        	System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX: " + tx.getStatus());
-        	System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX: " + tx);
-            transactionManager.resume(tx);
-            //If there's no ongoing tx then BatchingInterceptor creates one and then invokes next interceptor,
-            // so that all interceptors in the stack will be executed in a transactional context.
-            // This is where a new context (TxInvocationContext) is created, as the existing context is not transactional: NonTxInvocationContext.
-            InvocationContext txContext = icc.createInvocationContext(true, -1);
-            txContext.setFlags(ctx.getFlags());
-            return invokeNextInterceptor(txContext, command);
+        	if (tx.getStatus() == Status.STATUS_COMMITTING) {
+        		return invokeNextInterceptor(ctx, command);		
+        	} else {
+        		transactionManager.resume(tx);
+                //If there's no ongoing tx then BatchingInterceptor creates one and then invokes next interceptor,
+                // so that all interceptors in the stack will be executed in a transactional context.
+                // This is where a new context (TxInvocationContext) is created, as the existing context is not transactional: NonTxInvocationContext.
+                InvocationContext txContext = icc.createInvocationContext(true, -1);
+                txContext.setFlags(ctx.getFlags());
+                return invokeNextInterceptor(txContext, command);
+        	}
          } finally {
             if (transactionManager.getTransaction() != null && batchContainer.isSuspendTxAfterInvocation())
                transactionManager.suspend();

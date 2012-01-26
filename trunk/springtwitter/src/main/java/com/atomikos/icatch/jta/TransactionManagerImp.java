@@ -438,7 +438,6 @@ public class TransactionManagerImp implements TransactionManager, SubTxAwarePart
 			tx = getPreviousInstance(ct.getTid());
 			ret = tx.getStatus();
 		}
-
 		return ret;
 	}
 

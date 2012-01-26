@@ -45,11 +45,7 @@
         <property name="jpaVendorAdapter">
         	<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"></bean>
         </property>
-        <property name="packagesToScan">
-            <list>
-                <value>com.lucho.domain</value>
-            </list>
-        </property>
+        <property name="persistenceUnitName" value="springtwitter" />
         <!-- IMPORTANT: make sure to tell Hibernate to use JTA -->
         <property name="jpaProperties">
             <props>
@@ -61,14 +57,17 @@
                 <prop key="hibernate.transaction.jta.platform">
                 	com.lucho.util.AtomikosJtaPlatform
                 </prop>
-                <prop key="hibernate.cache.use_second_level_cache">true</prop>
-                <prop key="hibernate.cache.use_query_cache">true</prop>
-                
+                <prop key="hibernate.cache.use_second_level_cache">false</prop>
+                <prop key="hibernate.cache.use_query_cache">false</prop>
+                <!-- 
                 <prop key="hibernate.cache.region.factory_class">
                     org.hibernate.cache.infinispan.JndiInfinispanRegionFactory
                 </prop>
+                 -->
                 <!-- property for when getting Infinispan's Cache Manager from JNDI -->
+                <!-- 
                 <prop key="hibernate.cache.infinispan.cachemanager">comp/CacheManager</prop>
+                 -->
                 <!-- properties used when building own Cache Manager -->
                 <!--  
                 <prop key="hibernate.cache.infinispan.entity.eviction.strategy">LRU</prop>
@@ -77,12 +76,16 @@
                 <prop key="hibernate.cache.infinispan.entity.expiration.lifespan">60000</prop>
                 <prop key="hibernate.cache.infinispan.entity.expiration.max_idle">30000</prop>
  				-->
- 				
+                <prop key="hibernate.search.default.directory_provider">ram</prop>
+ 				<!-- 
                 <prop key="hibernate.search.default.directory_provider">infinispan</prop>
+                -->
                 <prop key="hibernate.search.default.data_cachename">LuceneIndexesData</prop>
                 <prop key="hibernate.search.default.metadata_cachename">LuceneIndexesMetadata</prop>
                 <!-- Infinispan for Hibernate Search will use the same Cache Manager obtained from JNDI -->
+                <!-- 
                 <prop key="hibernate.search.infinispan.cachemanager_jndiname">comp/CacheManager</prop>
+                 -->
                 <!-- 
                 <prop key="hibernate.search.infinispan.configuration_resourcename">infinispan.cfg.xml</prop>
                  -->
