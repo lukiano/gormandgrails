@@ -30,7 +30,7 @@ import javax.validation.constraints.Size;
                 })
         })
 
-public final class Tweet implements Identifiable {
+public class Tweet implements Identifiable {
 
     private static final int MAX_TWEET_LENGTH = 140;
 

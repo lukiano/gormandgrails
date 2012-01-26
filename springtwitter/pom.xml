@@ -17,7 +17,7 @@
         <slf4j.version>1.6.4</slf4j.version>
         <jackson.version>1.9.3</jackson.version>
         <hibernate.version>4.0.1.Final</hibernate.version>
-        <hibernate.search.version>4.0.0.Final</hibernate.search.version>       <!-- 3.4.1.Final -->
+        <hibernate.search.version>4.1.0.Alpha1</hibernate.search.version>       <!-- 3.4.1.Final -->
         <hibernate.validator.version>4.2.0.Final</hibernate.validator.version>
         <infinispan.version>5.1.0.CR4</infinispan.version>
         <jaxb.version>2.2.4</jaxb.version>
@@ -66,6 +66,31 @@
             <version>${spring.version}</version>
             <scope>test</scope>
         </dependency>
+
+		<!-- aspects -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-instrument</artifactId>
+            <version>${spring.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-instrument-tomcat</artifactId>
+            <version>${spring.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjrt</artifactId>
+            <version>1.6.8</version>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>1.6.8</version>
+        </dependency>
+        
         
         <!-- Spring Security -->
         <dependency>
@@ -333,21 +358,16 @@
         </dependency>
  		
         <!-- Databases -->
+        <!--
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
             <version>10.8.2.2</version>
         </dependency>
-        <!--
         <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc14</artifactId>
             <version>10.2.0.4.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.microsoft.sqlserver</groupId>
-            <artifactId>jdbc</artifactId>
-            <version>4.0.ctp2</version>
         </dependency>
         <dependency>
             <groupId>postgresql</groupId>
@@ -355,6 +375,11 @@
             <version>9.0-801.jdbc4</version>
         </dependency>
         -->
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>jdbc</artifactId>
+            <version>4.0.ctp3</version>
+        </dependency>
 
         <!-- Jackson JSON -->
         <dependency>
