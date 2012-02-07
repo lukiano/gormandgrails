@@ -50,7 +50,7 @@ public class BatchingInterceptor extends CommandInterceptor {
       // if in a batch, attach tx
       if (transactionManager.getTransaction() == null && (tx = batchContainer.getBatchTransaction()) != null) {
          try {
-        	if (tx.getStatus() == Status.STATUS_COMMITTING) {
+        	if (tx.getStatus() != Status.STATUS_ACTIVE) {
         		return invokeNextInterceptor(ctx, command);		
         	} else {
         		transactionManager.resume(tx);

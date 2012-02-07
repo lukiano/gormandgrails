@@ -20,20 +20,33 @@
     <amq:queue id="destination" physicalName="org.apache.activemq.spring.Test.spring.embedded"/>
      -->
 
+
+    <!--
     <bean id="xaFactory"
           class="org.apache.activemq.ActiveMQXAConnectionFactory" depends-on="twBroker">
         <property name="brokerURL" value="vm://localhost"/>
     </bean>
 
-    <!--
          Configure the JMS connector;
          call init to register for recovery!
-    -->
     <bean id="connectionFactory"
           class="com.atomikos.jms.AtomikosConnectionFactoryBean"
           init-method="init" destroy-method="close">
         <property name="uniqueResourceName" value="DATOPIC_BROKER"/>
         <property name="xaConnectionFactory" ref="xaFactory"/>
+    </bean>
+    -->
+    
+    
+	<bean id="connectionFactory" class="bitronix.tm.resource.jms.PoolingConnectionFactory" init-method="init" destroy-method="close" depends-on="twBroker">
+        <property name="className" value="org.apache.activemq.ActiveMQXAConnectionFactory" />
+        <property name="uniqueName" value="DATOPIC_BROKER" />
+        <property name="maxPoolSize" value="3" />
+        <property name="driverProperties">
+            <props>
+                <prop key="brokerURL">vm://localhost</prop>
+            </props>
+        </property>
     </bean>
 
     <!--
@@ -54,7 +67,7 @@
     -->
     <bean id="messageListenerContainer"
           class="org.springframework.jms.listener.DefaultMessageListenerContainer"
-          depends-on="atomikosTransactionManager">
+          depends-on="transactionManager">
         <property name="transactionManager" ref="transactionManager"/>
         <property name="connectionFactory" ref="connectionFactory"/>
         <property name="messageListener" ref="messageListener"/>
