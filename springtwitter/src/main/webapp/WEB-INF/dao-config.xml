@@ -15,24 +15,27 @@
 
     <util:properties id="jdbcConfiguration" location="classpath:jdbcdatasource.properties"/>
 
-    <!-- configure an Atomikos JTA-aware datasource -->
-    <bean id="datasource"
+    <!-- configure an Atomikos JTA-aware datasource
+    <bean id="dataSource"
           class="com.atomikos.jdbc.AtomikosDataSourceBean"
-          init-method="init" destroy-method="close">
-        <!-- set an arbitrary but unique name for the datasource -->
+          init-method="init" destroy-method="close" depends-on="transactionManager">
         <property name="uniqueResourceName" value="XADBMS" />
         <property name="maxPoolSize" value="50"/>
         <property name="minPoolSize" value="5"/>
-        <!--
-             set the underlying driver class to use,
-             in this example case we use Oracle
-        -->
         <property name="xaDataSourceClassName" value="${datasource.classname}"/>
         <property name="xaProperties" ref="jdbcConfiguration" />
-
-        <!-- how many connections in the pool? -->
         <property name="poolSize" value="3"/>
     </bean>
+    -->
+    <bean id="dataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" init-method="init" destroy-method="close" depends-on="transactionManager">
+    	<property name="className" value="${datasource.classname}" />
+    	<property name="uniqueName" value="XADBMS" />
+        <property name="maxPoolSize" value="50"/>
+        <property name="minPoolSize" value="5"/>
+    	<property name="driverProperties" ref="jdbcConfiguration" />
+    	<property name="ignoreRecoveryFailures" value="true" />
+    	<property name="allowLocalTransactions" value="true" />
+	</bean>
 
     <bean id="sessionFactory"
           class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" depends-on="cacheManagerJNDI">
@@ -41,7 +44,7 @@
              IMPORTANT: make sure to refer to an ATOMIKOS
              JTA/XA datasource for the sessionFactory!
         -->
-        <property name="dataSource" ref="datasource" />
+        <property name="dataSource" ref="dataSource" />
         <property name="jpaVendorAdapter">
         	<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"></bean>
         </property>
@@ -54,38 +57,34 @@
                 <!-- <prop key="hibernate.connection.isolation">3</prop>    -->
                 <prop key="hibernate.current_session_context_class">jta</prop>
                 <prop key="hibernate.id.new_generator_mappings">true</prop>
+                
+                <!--  com.lucho.util.AtomikosJtaPlatform -->
                 <prop key="hibernate.transaction.jta.platform">
-                	com.lucho.util.AtomikosJtaPlatform
+                	org.hibernate.service.jta.platform.internal.BitronixJtaPlatform
                 </prop>
-                <prop key="hibernate.cache.use_second_level_cache">false</prop>
-                <prop key="hibernate.cache.use_query_cache">false</prop>
-                <!-- 
+                
+                <prop key="hibernate.cache.use_second_level_cache">true</prop>
+                <prop key="hibernate.cache.use_query_cache">true</prop>
                 <prop key="hibernate.cache.region.factory_class">
                     org.hibernate.cache.infinispan.JndiInfinispanRegionFactory
                 </prop>
-                 -->
                 <!-- property for when getting Infinispan's Cache Manager from JNDI -->
-                <!-- 
                 <prop key="hibernate.cache.infinispan.cachemanager">comp/CacheManager</prop>
-                 -->
                 <!-- properties used when building own Cache Manager -->
-                <!--  
                 <prop key="hibernate.cache.infinispan.entity.eviction.strategy">LRU</prop>
                 <prop key="hibernate.cache.infinispan.entity.eviction.wake_up_interval">2000</prop>
                 <prop key="hibernate.cache.infinispan.entity.eviction.max_entries">5000</prop>
                 <prop key="hibernate.cache.infinispan.entity.expiration.lifespan">60000</prop>
                 <prop key="hibernate.cache.infinispan.entity.expiration.max_idle">30000</prop>
- 				-->
+                <!--
                 <prop key="hibernate.search.default.directory_provider">ram</prop>
- 				<!-- 
-                <prop key="hibernate.search.default.directory_provider">infinispan</prop>
                 -->
+                <prop key="hibernate.search.default.directory_provider">infinispan</prop>
                 <prop key="hibernate.search.default.data_cachename">LuceneIndexesData</prop>
                 <prop key="hibernate.search.default.metadata_cachename">LuceneIndexesMetadata</prop>
                 <!-- Infinispan for Hibernate Search will use the same Cache Manager obtained from JNDI -->
-                <!-- 
                 <prop key="hibernate.search.infinispan.cachemanager_jndiname">comp/CacheManager</prop>
-                 -->
+                
                 <!-- 
                 <prop key="hibernate.search.infinispan.configuration_resourcename">infinispan.cfg.xml</prop>
                  -->
