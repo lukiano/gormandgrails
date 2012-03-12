@@ -59,7 +59,7 @@ public final class UserServiceImpl implements UserDetailsService, UserService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = false)
     public User addUser(final String username, final String password) {
         if (this.userDao.userExists(username)) {
             return null;

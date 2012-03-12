@@ -27,7 +27,7 @@ final class TweetDaoImpl implements TweetDao {
     @Override
     @SuppressWarnings("unchecked")
     public List<Tweet> getTweetsForUser(final User user) {
-    	Query query = this.entityManager.createQuery("from Tweet where owner.id = :userId");
+    	Query query = this.entityManager.createQuery("select t from Tweet t where t.owner.id = :userId");
         query.setParameter("userId", user.getId());
         query.setMaxResults(MAX_RESULTS);
         return query.getResultList();
@@ -48,7 +48,8 @@ final class TweetDaoImpl implements TweetDao {
         tweet.setOwner(user);
         tweet.setTweet(text);
         tweet.setCreationDate(new DateTime());
-        return this.entityManager.merge(tweet);
+        this.entityManager.persist(tweet);
+        return tweet;
     }
 
     @Override

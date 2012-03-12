@@ -92,6 +92,7 @@
 			transactionManagerLookupClass="com.lucho.util.BitronixTransactionManagerLookup"> <!-- com.lucho.util.AtomikosTransactionManagerLookup -->
 			<recovery enabled="false" />
 		</transaction>
+		<!-- 
 		<loaders>
 			<loader
 				class="org.infinispan.loaders.jdbc.stringbased.JdbcStringBasedCacheStore"
@@ -115,6 +116,7 @@
 				</properties>
 			</loader>
 		</loaders>
+		 -->
 	</namedCache>
 
 	<!-- **************************** -->
@@ -130,6 +132,7 @@
 			transactionManagerLookupClass="com.lucho.util.BitronixTransactionManagerLookup">
 			<recovery enabled="false" />
 		</transaction>
+		<!-- 
 		<loaders>
 			<loader
 				class="org.infinispan.loaders.jdbc.stringbased.JdbcStringBasedCacheStore"
@@ -153,6 +156,7 @@
 				</properties>
 			</loader>
 		</loaders>
+		 -->
 	</namedCache>
 
 	<!-- ***************************** -->
@@ -165,10 +169,11 @@
 			<sync replTimeout="25000" />
 		</clustering>
 
-		<transaction useSynchronization="false"
+		<transaction useSynchronization="true"
 			transactionManagerLookupClass="com.lucho.util.BitronixTransactionManagerLookup">
-			<recovery enabled="true" />
+			<recovery enabled="false" />
 		</transaction>
+		<!-- 
 		<loaders>
 			<loader
 				class="org.infinispan.loaders.jdbc.stringbased.JdbcStringBasedCacheStore"
@@ -192,6 +197,7 @@
 				</properties>
 			</loader>
 		</loaders>
+		 -->
 	</namedCache>
 
 </infinispan>

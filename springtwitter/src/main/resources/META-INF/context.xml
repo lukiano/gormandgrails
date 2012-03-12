@@ -1,3 +1,0 @@
-<Context path="/springtwitter">
-    <Loader loaderClass="org.springframework.instrument.classloading.tomcat.TomcatInstrumentableClassLoader"/>
-</Context>
