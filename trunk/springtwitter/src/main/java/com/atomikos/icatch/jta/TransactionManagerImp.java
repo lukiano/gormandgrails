@@ -32,6 +32,7 @@ import com.atomikos.icatch.system.Configuration;
  * The JTA transaction manager implementation.
  */
 
+@SuppressWarnings({"deprecation","unchecked","rawtypes","unused"})
 public class TransactionManagerImp implements TransactionManager, SubTxAwareParticipant, Referenceable, UserTransaction
 
 {
@@ -261,7 +262,6 @@ public class TransactionManagerImp implements TransactionManager, SubTxAwarePart
 	 * Custom begin to guarantee a timeout value through an argument.
 	 */
 
-	@SuppressWarnings("deprecation")
 	public void begin(int timeout) throws NotSupportedException, SystemException {
 		TransactionImp tx = null;
 		CompositeTransaction ct = null;
@@ -353,7 +353,6 @@ public class TransactionManagerImp implements TransactionManager, SubTxAwarePart
 	 * @see javax.transaction.TransactionManager
 	 */
 
-	@SuppressWarnings("unchecked")
 	public Transaction suspend() throws SystemException {
 		// make sure imported txs can be suspended...
 		getTransaction();

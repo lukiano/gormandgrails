@@ -6,8 +6,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
 
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
 import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
@@ -37,6 +35,7 @@ import com.atomikos.icatch.system.Configuration;
  * An adaptor for the javax transaction interface.
  */
 
+@SuppressWarnings({"deprecation","unchecked","rawtypes"})
 class TransactionImp implements Transaction
 {
 	
@@ -201,7 +200,7 @@ class TransactionImp implements Transaction
     }
 
     /**
-     * @see javax.transaction.Transaction.
+     * @see javax.transaction.Transaction
      */
 
     public void commit () throws javax.transaction.RollbackException,
@@ -230,7 +229,7 @@ class TransactionImp implements Transaction
     }
 
     /**
-     * @see javax.transaction.Transaction.
+     * @see javax.transaction.Transaction
      */
 
     public void rollback () throws IllegalStateException, SystemException
@@ -248,7 +247,7 @@ class TransactionImp implements Transaction
     }
 
     /**
-     * @see javax.transaction.Transaction.
+     * @see javax.transaction.Transaction
      */
 
     public void setRollbackOnly () throws IllegalStateException,
@@ -259,7 +258,7 @@ class TransactionImp implements Transaction
     }
 
     /**
-     * @see javax.transaction.Transaction.
+     * @see javax.transaction.Transaction
      */
 
     public boolean enlistResource ( XAResource xares )
@@ -394,7 +393,7 @@ class TransactionImp implements Transaction
     }
 
     /**
-     * @see javax.transaction.Transaction.
+     * @see javax.transaction.Transaction
      */
 
     public boolean delistResource ( XAResource xares , int flag )

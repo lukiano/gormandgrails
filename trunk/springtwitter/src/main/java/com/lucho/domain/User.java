@@ -48,7 +48,6 @@ public class User implements UserDetails, Identifiable {
 
     @OneToMany
     @JsonIgnore
-    @Column(name = "t_user_id")
     private List<User> followedBy;
 
     @Transient

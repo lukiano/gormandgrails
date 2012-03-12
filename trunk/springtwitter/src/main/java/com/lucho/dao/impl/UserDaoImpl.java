@@ -25,14 +25,14 @@ final class UserDaoImpl implements UserDao {
 
     @Override
     public User getUser(final String username) {
-        Query query = this.entityManager.createQuery("from User where username = :name");
+        Query query = this.entityManager.createQuery("select u from User u where u.username = :name");
         query.setParameter("name", username);
         return (User) query.getSingleResult();
     }
 
     @Override
     public boolean userExists(final String username) {
-        Query query = this.entityManager.createQuery("select count(*) from User where username = :name");
+        Query query = this.entityManager.createQuery("select count(user) from User user where user.username = :name");
         query.setParameter("name", username);
         Long count = (Long) query.getSingleResult();
         return count.intValue() == 1;
@@ -43,7 +43,7 @@ final class UserDaoImpl implements UserDao {
         User user = new User();
         user.setUsername(username);
         user.setPassword(password);
-        user = this.entityManager.merge(user);
+        this.entityManager.persist(user);
         List<User> followedBy = user.getFollowedBy();
         if (followedBy == null) {
             followedBy = new ArrayList<User>();
@@ -58,7 +58,7 @@ final class UserDaoImpl implements UserDao {
 
     @Override
     public boolean notFollowedBy(final User user, final User userToFollow) {
-        Query query = this.entityManager.createQuery("select count(*) from User user inner join user.followedBy followed where user.id = :userToFollowId and followed.id = :userId");
+        Query query = this.entityManager.createQuery("select count(user) from User user inner join user.followedBy followed where user.id = :userToFollowId and followed.id = :userId");
         query.setParameter("userToFollowId", userToFollow.getId());
         query.setParameter("userId", user.getId());
         Long count = (Long) query.getSingleResult();
