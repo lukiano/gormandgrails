@@ -19,6 +19,7 @@
     <import resource="tx-config.xml"/>
     <import resource="security-config.xml"/>
     <import resource="dao-config.xml"/>
+    <import resource="jpa-config.xml"/>
     <import resource="jms-config.xml"/>
 
 </beans>

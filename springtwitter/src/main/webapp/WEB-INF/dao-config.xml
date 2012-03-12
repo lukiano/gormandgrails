@@ -63,6 +63,10 @@
                 	org.hibernate.service.jta.platform.internal.BitronixJtaPlatform
                 </prop>
                 
+                <prop key="hibernate.transaction.factory_class">
+                	org.hibernate.transaction.JTATransactionFactory
+                </prop>
+                
                 <prop key="hibernate.cache.use_second_level_cache">true</prop>
                 <prop key="hibernate.cache.use_query_cache">true</prop>
                 <prop key="hibernate.cache.region.factory_class">
