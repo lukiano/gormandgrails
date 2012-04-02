@@ -92,7 +92,6 @@
 			transactionManagerLookupClass="com.lucho.util.BitronixTransactionManagerLookup"> <!-- com.lucho.util.AtomikosTransactionManagerLookup -->
 			<recovery enabled="false" />
 		</transaction>
-		<!-- 
 		<loaders>
 			<loader
 				class="org.infinispan.loaders.jdbc.stringbased.JdbcStringBasedCacheStore"
@@ -104,19 +103,25 @@
 					<property name="idColumnName" value="ID_COLUMN" />
 					<property name="dataColumnName" value="DATA_COLUMN" />
 					<property name="timestampColumnName" value="TIMESTAMP_COLUMN" />
-					<property name="timestampColumnType" value="BIGINT" />
+					<property name="timestampColumnType" value="bigint" />
+                    <!--
 					<property name="connectionFactoryClass"
 						value="org.infinispan.loaders.jdbc.connectionfactory.ManagedConnectionFactory" />
 					<property name="datasourceJndiLocation"
 						value="comp/DataSource" />
-					<property name="idColumnType" value="VARCHAR(255)" />
-					<property name="dataColumnType" value="BINARY" />
-					<property name="dropTableOnExit" value="true" />
+					-->
+                    <property name="connectionFactoryClass"
+                              value="org.infinispan.loaders.jdbc.connectionfactory.PooledConnectionFactory"/>
+                    <property name="connectionUrl" value="jdbc:postgresql://localhost/java?user=javajava&amp;password=javajava"/>
+                    <property name="driverClass" value="org.postgresql.Driver"/>
+
+					<property name="idColumnType" value="varchar(255)" />
+					<property name="dataColumnType" value="bytea" />
+					<property name="dropTableOnExit" value="false" />
 					<property name="createTableOnStart" value="true" />
 				</properties>
 			</loader>
 		</loaders>
-		 -->
 	</namedCache>
 
 	<!-- **************************** -->
@@ -132,7 +137,6 @@
 			transactionManagerLookupClass="com.lucho.util.BitronixTransactionManagerLookup">
 			<recovery enabled="false" />
 		</transaction>
-		<!-- 
 		<loaders>
 			<loader
 				class="org.infinispan.loaders.jdbc.stringbased.JdbcStringBasedCacheStore"
@@ -144,19 +148,25 @@
 					<property name="idColumnName" value="ID_COLUMN" />
 					<property name="dataColumnName" value="DATA_COLUMN" />
 					<property name="timestampColumnName" value="TIMESTAMP_COLUMN" />
-					<property name="timestampColumnType" value="BIGINT" />
+					<property name="timestampColumnType" value="bigint" />
+                    <!--
 					<property name="connectionFactoryClass"
 						value="org.infinispan.loaders.jdbc.connectionfactory.ManagedConnectionFactory" />
 					<property name="datasourceJndiLocation"
 						value="comp/DataSource" />
-					<property name="idColumnType" value="VARCHAR(255)" />
-					<property name="dataColumnType" value="BINARY" />
-					<property name="dropTableOnExit" value="true" />
+					-->
+                    <property name="connectionFactoryClass"
+                              value="org.infinispan.loaders.jdbc.connectionfactory.PooledConnectionFactory"/>
+                    <property name="connectionUrl" value="jdbc:postgresql://localhost/java?user=javajava&amp;password=javajava"/>
+                    <property name="driverClass" value="org.postgresql.Driver"/>
+
+                    <property name="idColumnType" value="varchar(255)" />
+					<property name="dataColumnType" value="bytea" />
+					<property name="dropTableOnExit" value="false" />
 					<property name="createTableOnStart" value="true" />
 				</properties>
 			</loader>
 		</loaders>
-		 -->
 	</namedCache>
 
 	<!-- ***************************** -->
@@ -173,7 +183,7 @@
 			transactionManagerLookupClass="com.lucho.util.BitronixTransactionManagerLookup">
 			<recovery enabled="false" />
 		</transaction>
-		<!-- 
+        <!-- locking without table
 		<loaders>
 			<loader
 				class="org.infinispan.loaders.jdbc.stringbased.JdbcStringBasedCacheStore"
@@ -185,19 +195,19 @@
 					<property name="idColumnName" value="ID_COLUMN" />
 					<property name="dataColumnName" value="DATA_COLUMN" />
 					<property name="timestampColumnName" value="TIMESTAMP_COLUMN" />
-					<property name="timestampColumnType" value="BIGINT" />
+					<property name="timestampColumnType" value="bigint" />
 					<property name="connectionFactoryClass"
 						value="org.infinispan.loaders.jdbc.connectionfactory.ManagedConnectionFactory" />
 					<property name="datasourceJndiLocation"
 						value="comp/DataSource" />
-					<property name="idColumnType" value="VARCHAR(255)" />
-					<property name="dataColumnType" value="BINARY" />
+					<property name="idColumnType" value="varchar(255)" />
+					<property name="dataColumnType" value="bytea" />
 					<property name="dropTableOnExit" value="true" />
 					<property name="createTableOnStart" value="true" />
 				</properties>
 			</loader>
 		</loaders>
-		 -->
+		-->
 	</namedCache>
 
 </infinispan>
