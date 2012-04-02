@@ -1,27 +1,32 @@
 function registerCallback(data) {
-    alert("Data Loaded: " + data);
+    "use strict";
+    window.alert(data);
 }
 
 function register() {
+    "use strict";
     var usern = $("#j_username").val();
     var passw = $("#j_password").val();
-    $.post("/register", { username:usern, password:passw }, registerCallback, 'json');
+    jQuery.post("register", { username: usern, password: passw }, registerCallback, 'json');
 }
 
 function checkUserCallback(data) {
+    "use strict";
     if (data) {
-        $("#checkname").text("User already exists with that name");
+        jQuery("#checkname").text("User already exists with that name");
     } else {
-        $("#checkname").text("Name is free to use.");
+        jQuery("#checkname").text("Name is free to use.");
     }
 }
 
 function checkUser() {
+    "use strict";
     var usern = $("#j_username").val();
-    $.getJSON("/exists?name=" + usern, null, checkUserCallback);
+    jQuery.getJSON("exists?name=" + usern, null, checkUserCallback);
 }
 
 function ready() {
-    $("#register").click(register);
-    $("#j_username").blur(checkUser);
+    "use strict";
+    jQuery("#register").click(register);
+    jQuery("#j_username").blur(checkUser);
 }
