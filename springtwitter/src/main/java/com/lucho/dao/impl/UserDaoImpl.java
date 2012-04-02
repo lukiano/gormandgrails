@@ -48,11 +48,12 @@ final class UserDaoImpl implements UserDao {
         if (followedBy == null) {
             followedBy = new ArrayList<User>();
             followedBy.add(user);
-            user.setFollows(followedBy);
+            user.setFollowedBy(followedBy);
         } else {
             followedBy.add(user);
         }
-        user = this.entityManager.merge(user);
+        //user = this.entityManager.merge(user);
+		//this.entityManager.flush();
         return user;
     }
 
@@ -67,8 +68,8 @@ final class UserDaoImpl implements UserDao {
 
     @Override
     public void followUser(final User user, final User userToFollow) {
-        User mergedUser = (User) this.entityManager.merge(user);
-        User mergedUserToFollow = (User) this.entityManager.merge(userToFollow);
+        User mergedUser = this.entityManager.merge(user);
+        User mergedUserToFollow = this.entityManager.merge(userToFollow);
         List<User> followedBy = mergedUserToFollow.getFollowedBy();
         followedBy.add(mergedUser);
         this.entityManager.merge(mergedUserToFollow);

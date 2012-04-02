@@ -12,24 +12,29 @@ import org.hibernate.search.annotations.Parameter;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.DateTime;
 
+import javax.annotation.Nonnull;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 
+/**
+ * Domain object that represents a tweet an user wrote.
+ */
 @Entity
 @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 @Indexed
-@Table(name="t_tweet")
+@Cacheable
+@Table(name = "t_tweet")
 @AnalyzerDef(name = "da_analyzer",
         tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
         filters = {
                 @TokenFilterDef(factory = LowerCaseFilterFactory.class),
-                @TokenFilterDef(factory = SnowballPorterFilterFactory.class, params = {
+                @TokenFilterDef(factory = SnowballPorterFilterFactory.class,
+                        params = {
                         @Parameter(name = "language", value = "Spanish")
                 })
         })
-
 public class Tweet implements Identifiable {
 
     private static final int MAX_TWEET_LENGTH = 140;
@@ -52,39 +57,51 @@ public class Tweet implements Identifiable {
 
     @NotNull
     @Past
-    @Type(type="org.joda.time.contrib.hibernate.PersistentDateTime")
+    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime creationDate;
 
     public DateTime getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(final DateTime creationDate) {
-        this.creationDate = creationDate;
+    public void setCreationDate(final DateTime theCreationDate) {
+        this.creationDate = theCreationDate;
     }
 
     @Override
-    public Integer getId() {
+	@Nonnull
+    public final Integer getId() {
         return id;
     }
 
-    public void setId(final Integer id) {
-        this.id = id;
+    public final void setId(final Integer anId) {
+        this.id = anId;
     }
 
-    public String getTweet() {
+    public final String getTweet() {
         return tweet;
     }
 
-    public void setTweet(final String tweet) {
-        this.tweet = tweet;
+    public final void setTweet(final String aTweet) {
+        this.tweet = aTweet;
     }
 
-    public User getOwner() {
+    public final User getOwner() {
         return owner;
     }
 
-    public void setOwner(final User owner) {
-        this.owner = owner;
+    public final void setOwner(final User newOwner) {
+        this.owner = newOwner;
     }
+
+	@Override
+	public final boolean equals(final Object another) {
+		return (another == this)
+        || another instanceof Tweet && this.id.equals(((Tweet) another).id);
+	}
+
+	@Override
+	public final int hashCode() {
+		return this.id;
+	}
 }
