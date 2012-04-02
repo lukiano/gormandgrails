@@ -2,7 +2,6 @@ package com.lucho.controller;
 
 import com.lucho.domain.User;
 import com.lucho.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.TransactionException;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,16 +9,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
 @Controller
 final class LoginController {
 
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    public void setUserService(final UserService userService) {
+	@Inject
+	public LoginController(final UserService userService) {
         this.userService = userService;
     }
 
@@ -47,7 +47,7 @@ final class LoginController {
     @RequestMapping(value = "/exists", method = RequestMethod.GET)
     @ResponseBody
     public Boolean exists(@RequestParam(value = "name") final String username) {
-        return this.userService.userExists(username);
-    }
+		return this.userService.userExists(username);
+	}
 
 }

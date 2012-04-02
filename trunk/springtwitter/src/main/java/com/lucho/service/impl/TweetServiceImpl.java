@@ -81,7 +81,7 @@ public final class TweetServiceImpl implements TweetService {
         }
 
         @Override
-        public Message createMessage(Session session) throws JMSException {
+        public Message createMessage(final Session session) throws JMSException {
             MapMessage mapMessage = session.createMapMessage();
             mapMessage.setInt("owner", this.tweet.getOwner().getId());
             mapMessage.setString("tweet", this.tweet.getTweet());

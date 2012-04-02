@@ -7,21 +7,26 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.annotation.Nonnull;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Represents a user of the system.
+ */
 @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 @Entity
-@Table(name="t_user",
-    uniqueConstraints = {@UniqueConstraint(columnNames={"username"})}
+@Cacheable
+@Table(name = "t_user",
+    uniqueConstraints = {@UniqueConstraint(columnNames = {"username"})}
 )
 public class User implements UserDetails, Identifiable {
 
     /**
-	 * 
+	 * Unique identifier for serialization purposes.
 	 */
 	private static final long serialVersionUID = 5788883283199993395L;
 	
@@ -46,7 +51,7 @@ public class User implements UserDetails, Identifiable {
     @JsonIgnore
     private String password;
 
-    @OneToMany
+    @ManyToMany
     @JsonIgnore
     private List<User> followedBy;
 
@@ -59,81 +64,93 @@ public class User implements UserDetails, Identifiable {
 
     @Override
     @JsonIgnore
-    public Integer getId() {
+	@Nonnull
+    public final Integer getId() {
         return id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public final void setId(final Integer anId) {
+        this.id = anId;
     }
 
     @Override
-    public String getUsername() {
+    public final String getUsername() {
         return username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public final void setUsername(final String anUsername) {
+        this.username = anUsername;
     }
 
     @Override
     @JsonIgnore
-    public Collection<GrantedAuthority> getAuthorities() {
+    public final Collection<GrantedAuthority> getAuthorities() {
         return this.authorities;
     }
 
     @JsonIgnore
-    public String getPassword() {
+    public final String getPassword() {
         return password;
     }
 
 
     @Override
     @JsonIgnore
-    public boolean isAccountNonExpired() {
+    public final boolean isAccountNonExpired() {
         return true;
     }
 
     @Override
     @JsonIgnore
-    public boolean isAccountNonLocked() {
+    public final boolean isAccountNonLocked() {
         return true;
     }
 
     @Override
     @JsonIgnore
-    public boolean isCredentialsNonExpired() {
+    public final boolean isCredentialsNonExpired() {
         return true;
     }
 
     @Override
     @JsonIgnore
-    public boolean isEnabled() {
+    public final boolean isEnabled() {
         return true;
     }
 
-    public void setPassword(String password) {
+    public final void setPassword(final String password) {
         this.password = password;
     }
 
     @JsonIgnore
-    public List<User> getFollowedBy() {
+    public final List<User> getFollowedBy() {
         return followedBy;
     }
 
-    public void setFollows(List<User> followedBy) {
-        this.followedBy = followedBy;
+    public final void setFollowedBy(final List<User> followers) {
+        this.followedBy = followers;
     }
 
-    public void setAuthorities(List<GrantedAuthority> authorities) {
-        this.authorities = authorities;
+    public final void setAuthorities(final List<GrantedAuthority> theAuthorities) {
+        this.authorities = theAuthorities;
     }
 
-    public boolean isBeingFollowed() {
+    public final boolean isBeingFollowed() {
         return beingFollowed;
     }
 
-    public void setBeingFollowed(boolean beingFollowed) {
-        this.beingFollowed = beingFollowed;
+    public final void setBeingFollowed(final boolean isBeingFollowed) {
+        this.beingFollowed = isBeingFollowed;
     }
+
+	@Override
+	public final boolean equals(final Object another) {
+		return (another == this) || another instanceof User && this.id.equals(((User) another).id);
+	}
+
+	@Override
+	public final int hashCode() {
+		return this.id;
+	}
+
 }

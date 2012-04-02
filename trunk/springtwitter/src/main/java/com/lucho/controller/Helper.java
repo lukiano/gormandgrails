@@ -12,6 +12,7 @@ final class Helper {
 
     public static User getUser(final Principal principal) {
         Authentication authentication = (Authentication) principal;
+		if (authentication == null) return null;
         return (User) authentication.getPrincipal();
     }
 }
