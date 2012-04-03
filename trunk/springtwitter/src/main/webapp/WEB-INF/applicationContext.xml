@@ -15,11 +15,18 @@
     <context:load-time-weaver aspectj-weaving="on"/>
     <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
 
-	<import resource="cache-config.xml"/>
+    <bean id="messageSource"
+          class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="basename" value="classpath:messages" />
+        <property name="defaultEncoding" value="UTF-8"/>
+    </bean>
+
+    <import resource="cache-config.xml"/>
     <import resource="tx-config.xml"/>
     <import resource="security-config.xml"/>
     <import resource="dao-config.xml"/>
     <import resource="jpa-config.xml"/>
     <import resource="jms-config.xml"/>
+    <import resource="integration-config.xml"/>
 
 </beans>
