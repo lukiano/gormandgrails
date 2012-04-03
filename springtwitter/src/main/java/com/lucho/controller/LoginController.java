@@ -14,7 +14,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
 @Controller
-final class LoginController {
+public final class LoginController {
 
     private final UserService userService;
 

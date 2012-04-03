@@ -2,8 +2,6 @@ package com.lucho.controller;
 
 import com.lucho.domain.User;
 import com.lucho.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,7 +12,7 @@ import javax.inject.Inject;
 import java.security.Principal;
 
 @Controller
-final class UserController {
+public final class UserController {
 
     private final UserService userService;
 
@@ -23,7 +21,6 @@ final class UserController {
         this.userService = userService;
     }
 
-	@Secured({"ROLE_USER"})
 	@RequestMapping(value = "/t/follow", method = RequestMethod.POST)
     public void followUser(final Principal principal, @RequestParam(value = "name") final String username) {
         User user = Helper.getUser(principal);
@@ -31,7 +28,6 @@ final class UserController {
         this.userService.followUser(user, userToFollow);
     }
 
-	@Secured ({"ROLE_USER"})
 	@RequestMapping(value = "/t/shouldrefresh", method = RequestMethod.GET)
     @ResponseBody
     public Boolean shouldRefresh(final Principal principal) {
