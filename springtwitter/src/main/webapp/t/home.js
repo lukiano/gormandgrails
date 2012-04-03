@@ -58,8 +58,7 @@ function newTweet() {
 function checkForNewTweetsCallback(data) {
     "use strict";
     if (data) {
-        var tweetLine = $("#tweetLine");
-        tweetLine.prepend("<span>You have new tweets to read.</span>");
+        $("#unreadtweets").show();
     }
 }
 

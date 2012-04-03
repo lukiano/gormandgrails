@@ -54,18 +54,20 @@
          Where do we send updated time table info to?
          Note: this is a topic to allow multiple subscribers.
     -->
-    <bean id="topic" class="org.apache.activemq.command.ActiveMQTopic">
+    <bean id="daTopic" class="org.apache.activemq.command.ActiveMQTopic">
         <property name="physicalName" value="DATOPIC" />
     </bean>
 
-
+    <!--
     <bean id="messageListener" class="com.lucho.jms.TwitterMessageListener"/>
+    -->
 
     <!--
          a kind of message listener pool that will listen to
          messages posted to 'DATOPIC' with 3 threads,
          each one consuming a connection from bean 'ConnectionFactory'
     -->
+    <!--
     <bean id="messageListenerContainer"
           class="org.springframework.jms.listener.DefaultMessageListenerContainer"
           depends-on="transactionManager">
@@ -79,15 +81,17 @@
         <property name="sessionTransacted" value="true"/>
         <property name="sessionAcknowledgeMode" value="0" />
     </bean>
-
+    -->
     <!--
       JMS template for easy sending of timetable update messages with Spring
     -->
+    <!--
     <bean id="jmsTemplate"
           class="org.springframework.jms.core.JmsTemplate">
         <property name="connectionFactory" ref="connectionFactory" />
-        <property name="defaultDestination" ref="topic" />
+        <property name="defaultDestination" ref="daTopic" />
         <property name="receiveTimeout" value="1000"/>
     </bean>
+    -->
 
 </beans>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/integration
+        http://www.springframework.org/schema/integration/spring-integration-2.1.xsd
+        http://www.springframework.org/schema/integration/jms
+        http://www.springframework.org/schema/integration/jms/spring-integration-jms-2.1.xsd">
+
+    <int:annotation-config/>
+
+    <int:channel id="newTweetNotificationChannel" /> <!-- outbound channel -->
+    <int:transformer input-channel="newTweetNotificationChannel"
+                     output-channel="outboundNotificationChannel"
+                     expression="payload.getOwner().getId()" />
+    <int:channel id="outboundNotificationChannel" /> <!-- outbound channel -->
+    <int-jms:outbound-channel-adapter
+            channel="outboundNotificationChannel"
+            connection-factory="connectionFactory"
+            destination="daTopic"
+            pub-sub-domain="true" />
+
+    <int:channel id="inboundNotificationChannel" />
+    <int-jms:message-driven-channel-adapter
+            channel="inboundNotificationChannel"
+            connection-factory="connectionFactory"
+            transaction-manager="transactionManager"
+            destination="daTopic"
+            pub-sub-domain="true" />
+    <int:service-activator input-channel="inboundNotificationChannel" ref="userService" method="refreshFollowersFor" />
+
+</beans>
