@@ -43,10 +43,11 @@ final class TweetDaoImpl implements TweetDao {
     }
 
     @Override
-    public Tweet newTweet(final User user, final String text) {
+    public Tweet newTweet(final User user, final String text, final String language) {
         Tweet tweet = new Tweet();
         tweet.setOwner(user);
         tweet.setTweet(text);
+		tweet.setLanguage(language);
         tweet.setCreationDate(new DateTime());
         this.entityManager.persist(tweet);
         return tweet;
@@ -57,7 +58,7 @@ final class TweetDaoImpl implements TweetDao {
     public List<Tweet> searchTweets(final String textToSearch) {
         FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
 
-        // create native Lucene query unsing the query DSL
+        // create native Lucene query using the query DSL
         // alternatively you can write the Lucene query using the Lucene query parser
         // or the Lucene programmatic API. The Hibernate Search DSL is recommended though
         QueryBuilder qb = fullTextEntityManager.getSearchFactory()

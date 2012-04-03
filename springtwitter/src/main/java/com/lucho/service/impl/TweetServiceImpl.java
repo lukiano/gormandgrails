@@ -5,29 +5,18 @@ import com.lucho.domain.Tweet;
 import com.lucho.domain.User;
 import com.lucho.service.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessageCreator;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.integration.annotation.Publisher;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.jms.JMSException;
-import javax.jms.MapMessage;
-import javax.jms.Message;
-import javax.jms.Session;
 import java.util.List;
 
 @Service
 public final class TweetServiceImpl implements TweetService {
 
     private TweetDao tweetDao;
-
-    @Autowired
-    public void setJmsTemplate(final JmsTemplate jmsTemplate) {
-        this.jmsTemplate = jmsTemplate;
-    }
-
-    private JmsTemplate jmsTemplate;
 
     @Override
     @Transactional(readOnly = true)
@@ -48,16 +37,12 @@ public final class TweetServiceImpl implements TweetService {
     @Override
     @Transactional
     @Secured("ROLE_USER")
+	@Publisher(channel = "newTweetNotificationChannel")
     public Tweet newTweet(final User user, final String text) {
-        Tweet newTweet = this.tweetDao.newTweet(user, text);
+		String language = LocaleContextHolder.getLocale().getLanguage();
+        Tweet newTweet = this.tweetDao.newTweet(user, text, language);
         newTweet.getOwner().setBeingFollowed(true);
-        this.sendMessage(newTweet);
         return newTweet;
-    }
-
-    private void sendMessage(final Tweet newTweet) {
-        MessageCreator messageCreator = new TweetMessageCreator(newTweet);
-        this.jmsTemplate.send(messageCreator);
     }
 
     @Override
@@ -72,6 +57,7 @@ public final class TweetServiceImpl implements TweetService {
         return tweetList;
     }
 
+	/*
     private static class TweetMessageCreator implements MessageCreator {
 
         private final Tweet tweet;
@@ -89,5 +75,6 @@ public final class TweetServiceImpl implements TweetService {
         }
 
     }
+    */
 
 }

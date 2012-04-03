@@ -11,7 +11,7 @@ public interface TweetDao {
 
     List<Tweet> getTweetsForUserIncludingFollows(User user);
 
-    Tweet newTweet(User user, String text);
+    Tweet newTweet(User user, String text, String language);
 
     List<Tweet> searchTweets(String textToSearch);
 }

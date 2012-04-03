@@ -1,5 +1,8 @@
 package com.lucho.domain;
 
+import com.lucho.util.LanguageDiscriminator;
+import org.apache.solr.analysis.ASCIIFoldingFilterFactory;
+import org.apache.solr.analysis.ISOLatin1AccentFilterFactory;
 import org.apache.solr.analysis.LowerCaseFilterFactory;
 import org.apache.solr.analysis.SnowballPorterFilterFactory;
 import org.apache.solr.analysis.StandardTokenizerFactory;
@@ -26,15 +29,28 @@ import javax.validation.constraints.Size;
 @Indexed
 @Cacheable
 @Table(name = "t_tweet")
-@AnalyzerDef(name = "da_analyzer",
+@AnalyzerDefs({
+@AnalyzerDef(name = "en",
+		tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+		filters = {
+				@TokenFilterDef(factory = ASCIIFoldingFilterFactory.class),
+				@TokenFilterDef(factory = LowerCaseFilterFactory.class),
+				@TokenFilterDef(factory = SnowballPorterFilterFactory.class,
+						params = {
+								@Parameter(name = "language", value = "English")
+						})
+		}),
+@AnalyzerDef(name = "es",
         tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
         filters = {
+				@TokenFilterDef(factory = ASCIIFoldingFilterFactory.class),
                 @TokenFilterDef(factory = LowerCaseFilterFactory.class),
                 @TokenFilterDef(factory = SnowballPorterFilterFactory.class,
                         params = {
                         @Parameter(name = "language", value = "Spanish")
                 })
         })
+})
 public class Tweet implements Identifiable {
 
     private static final int MAX_TWEET_LENGTH = 140;
@@ -42,14 +58,19 @@ public class Tweet implements Identifiable {
     @Id
     @GeneratedValue
     @JsonIgnore
+	@DocumentId
     private Integer id;
 
     @NotNull
     @NotEmpty
     @Size(max = MAX_TWEET_LENGTH)
-    @Field(index = Index.YES, store = Store.NO)
+    @Field(index = Index.YES, store = Store.COMPRESS, termVector = TermVector.WITH_POSITION_OFFSETS)
     @Analyzer(definition = "da_analyzer")
     private String tweet;
+
+	@Field
+	@AnalyzerDiscriminator(impl = LanguageDiscriminator.class)
+	private String language;
 
     @NotNull
     @ManyToOne
@@ -94,6 +115,14 @@ public class Tweet implements Identifiable {
         this.owner = newOwner;
     }
 
+    public final String getLanguage() {
+		return language;
+	}
+
+    public final void setLanguage(final String newLanguage) {
+		this.language = newLanguage;
+	}
+
 	@Override
 	public final boolean equals(final Object another) {
 		return (another == this)
@@ -104,4 +133,5 @@ public class Tweet implements Identifiable {
 	public final int hashCode() {
 		return this.id;
 	}
+
 }
