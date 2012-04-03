@@ -1,10 +1,10 @@
 package com.lucho.service.impl;
 
-import com.lucho.dao.UserDao;
+import com.lucho.domain.QUser;
 import com.lucho.domain.User;
+import com.lucho.repository.UserRepository;
 import com.lucho.service.UserService;
 import org.infinispan.util.concurrent.ConcurrentHashSet;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +13,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -21,11 +23,11 @@ public final class UserServiceImpl implements UserDetailsService, UserService {
 
     private final ConcurrentHashSet<Integer> usersToBeRefreshed = new ConcurrentHashSet<Integer>();
 
-    private UserDao userDao;
+    private UserRepository userRepository;
 
-    @Autowired
-    public void setUserDao(final UserDao userDao) {
-        this.userDao = userDao;
+    @Inject
+    public void setUserRepository(final UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -43,50 +45,65 @@ public final class UserServiceImpl implements UserDetailsService, UserService {
     @Override
     @Transactional(readOnly = true)
     public User getUser(final Integer id) {
-        return this.userDao.getUser(id);
+        return this.userRepository.findOne(id);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public User getUser(String username) {
-        return this.userDao.getUser(username);
+    public User getUser(final String username) {
+        return this.userRepository.findByUsername(username);
     }
 
     @Override
     @Transactional(readOnly = true)
     public boolean userExists(final String username) {
-        return this.userDao.userExists(username);
+        return this.userRepository.count(QUser.user.username.eq(username)) > 0;
     }
 
     @Override
     @Transactional(readOnly = false)
     public User addUser(final String username, final String password) {
-        if (this.userDao.userExists(username)) {
-            return null;
+        User newUser = null;
+        if (!this.userExists(username)) {
+            User user = new User();
+            user.setUsername(username);
+            user.setPassword(password);
+            user = this.userRepository.saveAndFlush(user);
+            List<User> followedBy = user.getFollowedBy();
+            if (followedBy == null) {
+                followedBy = new ArrayList<>();
+                followedBy.add(user);
+                user.setFollowedBy(followedBy);
+            } else {
+                followedBy.add(user);
+            }
+            newUser = this.userRepository.save(user);
         }
-        return this.userDao.addUser(username, password);
+        return newUser;
     }
 
     @Override
     @Transactional
     public void followUser(final User user, final User userToFollow) {
+        /*
         if (this.userDao.notFollowedBy(user, userToFollow)) {
             this.userDao.followUser(user, userToFollow);
         }
+        */
     }
 
     @Override
     @Transactional
-    public void refreshFollowersFor(Integer ownerId) {
-        User user = this.userDao.getUser(ownerId);
+    public void refreshFollowersFor(final Integer ownerId) {
+        User user = this.userRepository.findOne(ownerId);
         List<User> followedByList = user.getFollowedBy();
         for (User follower : followedByList) {
-               usersToBeRefreshed.add(follower.getId());
+            usersToBeRefreshed.add(follower.getId());
         }
     }
 
     @Override
-    public boolean shouldRefresh(User user) {
+    public boolean shouldRefresh(final User user) {
         return usersToBeRefreshed.remove(user.getId());
     }
 

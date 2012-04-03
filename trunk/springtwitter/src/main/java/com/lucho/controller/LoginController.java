@@ -46,8 +46,8 @@ public final class LoginController {
 
     @RequestMapping(value = "/exists", method = RequestMethod.GET)
     @ResponseBody
-    public Boolean exists(@RequestParam(value = "name") final String username) {
-		return this.userService.userExists(username);
+    public String exists(@RequestParam(value = "name") final String username) {
+		return this.userService.userExists(username)?"User already exists with that name":"Name is free to use.";
 	}
 
 }
