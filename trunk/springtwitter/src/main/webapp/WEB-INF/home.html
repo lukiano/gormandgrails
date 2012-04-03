@@ -1,0 +1,31 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Spring Twitter</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js">
+    </script>
+</head>
+<body>
+<div id="inputBox">
+	<label for="newTweetText">What's on your mind?</label><input type="text" id="newTweetText" />
+</div>
+<hr />
+<div>
+	<label for="textToSearch">Search tweets that contains the following text:</label><input type="text" id="textToSearch" />
+</div>
+<hr />
+<div id="tweetLineBox">
+    <span>Your tweet line:</span>
+    <div id="tweetLine">
+    </div>
+</div>
+<hr />
+<div id="logout">
+	<a href="../logout">Log out</a>
+</div>
+<script type="text/javascript" src="home.js"></script>
+<script type="text/javascript">
+	$(document).ready(ready);
+</script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+    <bean id="placeholderConfig"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:application.properties"/>
+    </bean>
+
+    <util:properties id="jdbcConfiguration" location="classpath:jdbcdatasource.properties"/>
+    <util:properties id="hibernateProperties" location="classpath:hibernate.properties"/>
+
+    <!-- configure an Atomikos JTA-aware datasource
+    <bean id="dataSource"
+          class="com.atomikos.jdbc.AtomikosDataSourceBean"
+          init-method="init" destroy-method="close" depends-on="transactionManager">
+        <property name="uniqueResourceName" value="XADBMS" />
+        <property name="maxPoolSize" value="50"/>
+        <property name="minPoolSize" value="5"/>
+        <property name="xaDataSourceClassName" value="${datasource.classname}"/>
+        <property name="xaProperties" ref="jdbcConfiguration" />
+        <property name="poolSize" value="3"/>
+    </bean>
+    -->
+    <bean id="dataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" init-method="init" destroy-method="close" depends-on="transactionManager">
+    	<property name="className" value="${datasource.classname}" />
+    	<property name="uniqueName" value="XADBMS" />
+        <property name="maxPoolSize" value="50"/>
+        <property name="minPoolSize" value="5"/>
+    	<property name="driverProperties" ref="jdbcConfiguration" />
+    	<property name="ignoreRecoveryFailures" value="true" />
+    	<property name="allowLocalTransactions" value="true" />
+	</bean>
+
+    <bean id="sessionFactory"
+          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" depends-on="cacheManagerJNDI">
+
+        <!--
+             IMPORTANT: make sure to refer to an ATOMIKOS
+             JTA/XA datasource for the sessionFactory!
+        -->
+        <property name="dataSource" ref="dataSource" />
+        <property name="jpaVendorAdapter">
+        	<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
+        </property>
+        <property name="persistenceUnitName" value="springtwitter" />
+        <!-- IMPORTANT: make sure to tell Hibernate to use JTA -->
+        <property name="jpaProperties" ref="hibernateProperties" />
+    </bean>
+
+</beans>
