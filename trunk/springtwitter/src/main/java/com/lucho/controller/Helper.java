@@ -7,6 +7,7 @@ import java.security.Principal;
 
 /**
  * Helper class to get the User from Spring Security system.
+ * @author Luciano.Leggieri
  */
 final class Helper {
 

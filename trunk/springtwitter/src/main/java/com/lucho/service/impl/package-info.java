@@ -1,3 +1,3 @@
 /**
- * Service implementations.
+ * Business service implementations.
  */

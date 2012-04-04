@@ -3,7 +3,6 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
 <%@ page import="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter" %>
-<%@ page import="org.springframework.security.core.AuthenticationException" %>
 <%@ page import="org.springframework.security.web.WebAttributes" %>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
@@ -15,7 +14,7 @@
     <c:if test="${not empty param.login_error}">
         <div class="error">
             Your login attempt was not successful, try again.<br/><br/>
-            Reason: <%= ((AuthenticationException) session.getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION)).getMessage() %>
+            Reason: <%= ((Throwable) session.getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION)).getMessage() %>
         </div>
     </c:if>
     <form name="f" action="spring_security_login" method="post">

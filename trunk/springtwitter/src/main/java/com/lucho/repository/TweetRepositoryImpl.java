@@ -1,41 +1,36 @@
-package com.lucho.dao.impl;
+package com.lucho.repository;
 
-import com.lucho.dao.TweetDao;
+import com.lucho.domain.QTweet;
+import com.lucho.domain.QUser;
 import com.lucho.domain.Tweet;
 import com.lucho.domain.User;
+import com.lucho.repository.TweetRepositoryCustom;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.joda.time.DateTime;
+import org.springframework.data.jpa.repository.support.QueryDslRepositorySupport;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.util.List;
 
-final class TweetDaoImpl implements TweetDao {
+/**
+ * Created with IntelliJ IDEA.
+ * User: luciano
+ * Date: 4/3/12
+ * Time: 11:27 PM
+ * To change this template use File | Settings | File Templates.
+ */
+public class TweetRepositoryImpl extends QueryDslRepositorySupport implements TweetRepositoryCustom {
 
     private static final int MAX_RESULTS = 20;
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
     @Override
-    @SuppressWarnings("unchecked")
-    public List<Tweet> getTweetsForUser(final User user) {
-        Query query = this.entityManager.createQuery("select t from Tweet t where t.owner.id = :userId");
-        query.setParameter("userId", user.getId());
-        query.setMaxResults(MAX_RESULTS);
-        return query.getResultList();
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
     public List<Tweet> getTweetsForUserIncludingFollows(final User user) {
-        Query query = this.entityManager.createQuery("select tweet from Tweet tweet inner join tweet.owner.followedBy followed where followed.id = :userId");
-        query.setParameter("userId", user.getId());
-        query.setMaxResults(MAX_RESULTS);
-        return query.getResultList();
+        QTweet qtweet = QTweet.tweet1;
+        QUser followedBy = new QUser("followedBy");
+        return this.from(qtweet).join(qtweet.owner.followedBy, followedBy)
+                .where(followedBy.id.eq(user.getId())).limit(MAX_RESULTS).list(qtweet);
     }
 
     @Override
@@ -43,16 +38,15 @@ final class TweetDaoImpl implements TweetDao {
         Tweet tweet = new Tweet();
         tweet.setOwner(user);
         tweet.setTweet(text);
-		tweet.setLanguage(language);
+        tweet.setLanguage(language);
         tweet.setCreationDate(new DateTime());
-        this.entityManager.persist(tweet);
+        this.getEntityManager().persist(tweet);
         return tweet;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<Tweet> searchTweets(final String textToSearch) {
-        FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
+        FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(this.getEntityManager());
 
         // create native Lucene query using the query DSL
         // alternatively you can write the Lucene query using the Lucene query parser

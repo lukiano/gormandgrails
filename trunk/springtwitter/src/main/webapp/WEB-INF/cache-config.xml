@@ -6,7 +6,7 @@
                 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
                 http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-3.1.xsd">
 
-	<cache:annotation-driven />
+	<cache:annotation-driven mode="aspectj" />
 
 	<!-- Infinispan cache manager -->
 	<bean id="infinispanCacheManager"
@@ -19,13 +19,13 @@
 		</bean>
 		
 	<bean id="cacheManagerJNDI" class="com.lucho.util.JNDIExporter" depends-on="cacheManager">
-		<property name="objectToBind" ref="infinispanCacheManager" />
-		<property name="name" value="CacheManager" />
+        <constructor-arg index="0" ref="infinispanCacheManager" />
+        <constructor-arg index="1" value="CacheManager" />
 	</bean>
 
 	<bean id="dataSourceJNDI" class="com.lucho.util.JNDIExporter" depends-on="dataSource">
-		<property name="objectToBind" ref="dataSource" />
-		<property name="name" value="DataSource" />
+        <constructor-arg index="0" ref="dataSource" />
+        <constructor-arg index="1" value="DataSource" />
 	</bean>
 	
 </beans>

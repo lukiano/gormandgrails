@@ -1,16 +1,24 @@
 package com.lucho.util;
 
-import javax.transaction.TransactionManager;
-
+import bitronix.tm.TransactionManagerServices;
 import org.infinispan.transaction.lookup.TransactionManagerLookup;
 
-import bitronix.tm.TransactionManagerServices;
+import javax.transaction.TransactionManager;
 
-public final class BitronixTransactionManagerLookup implements TransactionManagerLookup {
-	
-	@Override
-	public TransactionManager getTransactionManager() throws Exception {
-		return TransactionManagerServices.getTransactionManager();
-	}
+/**
+ * Return the Bitronix Transaction Manager.
+ *
+ * @see TransactionManagerServices
+ */
+public final class BitronixTransactionManagerLookup
+        implements TransactionManagerLookup {
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TransactionManager getTransactionManager() throws Exception {
+        return TransactionManagerServices.getTransactionManager();
+    }
 
 }

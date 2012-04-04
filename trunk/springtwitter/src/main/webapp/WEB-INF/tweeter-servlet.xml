@@ -13,7 +13,7 @@
 
     <context:component-scan base-package="com.lucho.controller"/>
     <mvc:default-servlet-handler/>
-    <mvc:annotation-driven/>
+    <mvc:annotation-driven />
 
     <!-- Resolves logical view names returned by Controllers to Tiles; a view name to resolve is treated as the name of a tiles definition -->
     <bean id="tilesViewResolver" class="org.springframework.web.servlet.view.tiles2.TilesViewResolver">
@@ -47,8 +47,6 @@
 
     <bean id="handlerMapping"
           class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
-        <property name="interceptors">
-            <ref bean="localeChangeInterceptor" />
-        </property>
+        <property name="interceptors" ref="localeChangeInterceptor" />
     </bean>
 </beans>
