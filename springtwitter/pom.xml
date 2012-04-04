@@ -69,6 +69,11 @@
 			<scope>test</scope>
 		</dependency>
         <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aspects</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
             <version>1</version>
@@ -121,10 +126,15 @@
 		</dependency>
 
 		<!-- Spring Data -->
-		<dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons-core</artifactId>
+            <version>1.2.1.RELEASE</version>
+        </dependency>
+        <dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-jpa</artifactId>
-			<version>1.0.3.RELEASE</version>
+			<version>1.1.0.RC1</version>
 		</dependency>
 
 		<!-- Spring Integration -->
@@ -491,8 +501,12 @@
 			<id>jboss</id>
 			<url>https://repository.jboss.org/nexus/content/groups/public/</url>
 		</repository>
-
-	</repositories>
+        <repository>
+            <id>spring-milestone</id>
+            <name>Spring Maven MILESTONE Repository</name>
+            <url>http://maven.springframework.org/milestone</url>
+        </repository>
+    </repositories>
 
 	<build>
         <plugins>

@@ -13,6 +13,9 @@
     </context:component-scan>
     
     <context:load-time-weaver aspectj-weaving="on"/>
+    <context:spring-configured />
+    <context:annotation-config />
+
     <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
 
     <bean id="messageSource"

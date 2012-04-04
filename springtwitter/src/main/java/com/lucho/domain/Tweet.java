@@ -2,7 +2,6 @@ package com.lucho.domain;
 
 import com.lucho.util.LanguageDiscriminator;
 import org.apache.solr.analysis.ASCIIFoldingFilterFactory;
-import org.apache.solr.analysis.ISOLatin1AccentFilterFactory;
 import org.apache.solr.analysis.LowerCaseFilterFactory;
 import org.apache.solr.analysis.SnowballPorterFilterFactory;
 import org.apache.solr.analysis.StandardTokenizerFactory;
@@ -10,13 +9,28 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Type;
-import org.hibernate.search.annotations.*;
+import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.annotations.AnalyzerDefs;
+import org.hibernate.search.annotations.AnalyzerDiscriminator;
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Parameter;
+import org.hibernate.search.annotations.Store;
+import org.hibernate.search.annotations.TermVector;
+import org.hibernate.search.annotations.TokenFilterDef;
+import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nonnull;
-import javax.persistence.*;
+import javax.persistence.Cacheable;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
@@ -30,26 +44,36 @@ import javax.validation.constraints.Size;
 @Cacheable
 @Table(name = "t_tweet")
 @AnalyzerDefs({
-@AnalyzerDef(name = "en",
-		tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
-		filters = {
-				@TokenFilterDef(factory = ASCIIFoldingFilterFactory.class),
-				@TokenFilterDef(factory = LowerCaseFilterFactory.class),
-				@TokenFilterDef(factory = SnowballPorterFilterFactory.class,
-						params = {
-								@Parameter(name = "language", value = "English")
-						})
-		}),
-@AnalyzerDef(name = "es",
-        tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
-        filters = {
-				@TokenFilterDef(factory = ASCIIFoldingFilterFactory.class),
-                @TokenFilterDef(factory = LowerCaseFilterFactory.class),
-                @TokenFilterDef(factory = SnowballPorterFilterFactory.class,
-                        params = {
-                        @Parameter(name = "language", value = "Spanish")
+        @AnalyzerDef(name = "en",
+                tokenizer = @TokenizerDef(factory =
+                        StandardTokenizerFactory.class),
+                filters = {
+                        @TokenFilterDef(factory =
+                                ASCIIFoldingFilterFactory.class),
+                        @TokenFilterDef(factory =
+                                LowerCaseFilterFactory.class),
+                        @TokenFilterDef(factory =
+                                SnowballPorterFilterFactory.class,
+                                params = {
+                                        @Parameter(name = "language",
+                                                value = "English")
+                                })
+                }),
+        @AnalyzerDef(name = "es",
+                tokenizer = @TokenizerDef(factory =
+                        StandardTokenizerFactory.class),
+                filters = {
+                        @TokenFilterDef(factory =
+                                ASCIIFoldingFilterFactory.class),
+                        @TokenFilterDef(factory =
+                                LowerCaseFilterFactory.class),
+                        @TokenFilterDef(factory =
+                                SnowballPorterFilterFactory.class,
+                                params = {
+                                        @Parameter(name = "language",
+                                                value = "Spanish")
+                                })
                 })
-        })
 })
 public class Tweet implements Identifiable {
 
@@ -58,19 +82,19 @@ public class Tweet implements Identifiable {
     @Id
     @GeneratedValue
     @JsonIgnore
-	@DocumentId
+    @DocumentId
     private Integer id;
 
     @NotNull
     @NotEmpty
     @Size(max = MAX_TWEET_LENGTH)
-    @Field(index = Index.YES, store = Store.COMPRESS, termVector = TermVector.WITH_POSITION_OFFSETS)
-    @Analyzer(definition = "da_analyzer")
+    @Field(index = Index.YES, store = Store.COMPRESS,
+            termVector = TermVector.WITH_POSITION_OFFSETS)
     private String tweet;
 
-	@Field
-	@AnalyzerDiscriminator(impl = LanguageDiscriminator.class)
-	private String language;
+    @Field
+    @AnalyzerDiscriminator(impl = LanguageDiscriminator.class)
+    private String language;
 
     @NotNull
     @ManyToOne
@@ -78,7 +102,7 @@ public class Tweet implements Identifiable {
 
     @NotNull
     @Past
-    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime creationDate;
 
     public DateTime getCreationDate() {
@@ -90,7 +114,7 @@ public class Tweet implements Identifiable {
     }
 
     @Override
-	@Nonnull
+    @Nonnull
     public final Integer getId() {
         return id;
     }
@@ -116,22 +140,23 @@ public class Tweet implements Identifiable {
     }
 
     public final String getLanguage() {
-		return language;
-	}
+        return language;
+    }
 
     public final void setLanguage(final String newLanguage) {
-		this.language = newLanguage;
-	}
+        this.language = newLanguage;
+    }
 
-	@Override
-	public final boolean equals(final Object another) {
-		return (another == this)
-        || another instanceof Tweet && this.id.equals(((Tweet) another).id);
-	}
+    @Override
+    public final boolean equals(final Object another) {
+        return (another == this)
+                || another instanceof Tweet
+                && this.id.equals(((Tweet) another).id);
+    }
 
-	@Override
-	public final int hashCode() {
-		return this.id;
-	}
+    @Override
+    public final int hashCode() {
+        return this.id;
+    }
 
 }

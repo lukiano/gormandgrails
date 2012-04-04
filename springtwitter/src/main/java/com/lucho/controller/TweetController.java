@@ -14,9 +14,11 @@ import javax.inject.Inject;
 import java.security.Principal;
 import java.util.List;
 
+/**
+ * @author Luciano.Leggieri
+ */
 @Controller
-
-final class TweetController {
+public final class TweetController {
 
     private final TweetService tweetService;
 

@@ -1,46 +1,52 @@
 package com.lucho.util;
 
+import org.springframework.beans.factory.InitializingBean;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Required;
-
+/**
+ * Class that export a Spring bean to JNDI.
+ */
 public final class JNDIExporter implements InitializingBean {
-	
-	private String name;
 
-	private Object objectToBind;
+    /**
+     * JNDI name.
+     */
+    private final String name;
 
-	public String getName() {
-		return name;
-	}
+    /**
+     * Object to bind.
+     */
+    private final Object objectToBind;
 
-	@Required
-	public void setName(String name) {
-		this.name = name;
-	}
+    /**
+     * Class constructor.
+     *
+     * @param binding  Object to export to JNDI.
+     * @param bindName JNDI name.
+     */
+    public JNDIExporter(final Object binding, final String bindName) {
+        this.name = bindName;
+        this.objectToBind = binding;
+    }
 
-	public Object getObjectToBind() {
-		return objectToBind;
-	}
-
-	@Required
-	public void setObjectToBind(Object objectToBind) {
-		this.objectToBind = objectToBind;
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		Context initialContext = new InitialContext();
-		Context compContext;
-		try { 
-			compContext = (Context) initialContext.lookup("comp");
-		} catch(NameNotFoundException e) {
-			compContext = initialContext.createSubcontext("comp");
-		}
-		compContext.bind(this.getName(), this.getObjectToBind());		
-	}
+    /**
+     * Export object to JNDI.
+     *
+     * @throws Exception if an exception occurs while binding.
+     */
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        Context initialContext = new InitialContext();
+        Context compContext;
+        try {
+            compContext = (Context) initialContext.lookup("comp");
+        } catch (NameNotFoundException e) {
+            compContext = initialContext.createSubcontext("comp");
+        }
+        compContext.bind(this.name, this.objectToBind);
+    }
 
 }

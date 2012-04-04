@@ -1,18 +1,14 @@
 package com.lucho.dao.impl;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.lucho.dao.UserDao;
+import com.lucho.domain.User;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.springframework.stereotype.Repository;
-
-import com.lucho.dao.UserDao;
-import com.lucho.domain.User;
-
-@Repository
 final class UserDaoImpl implements UserDao {
 
 	@PersistenceContext
