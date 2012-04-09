@@ -13,6 +13,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.AnalyzerDiscriminator;
+import org.hibernate.search.annotations.CacheFromIndex;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
@@ -43,6 +44,7 @@ import javax.validation.constraints.Size;
 @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 @Indexed
 @Cacheable
+@CacheFromIndex
 @Table(name = "t_tweet")
 @AnalyzerDefs({
         @AnalyzerDef(name = "en",
