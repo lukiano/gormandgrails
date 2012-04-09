@@ -8,7 +8,15 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.annotation.Nonnull;
-import javax.persistence.*;
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Collection;
@@ -21,16 +29,16 @@ import java.util.List;
 @Entity
 @Cacheable
 @Table(name = "t_user",
-    uniqueConstraints = {@UniqueConstraint(columnNames = {"username"})}
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"username"})}
 )
-public class User implements UserDetails, Identifiable {
+public class User implements UserDetails {
 
     /**
-	 * Unique identifier for serialization purposes.
-	 */
-	private static final long serialVersionUID = 5788883283199993395L;
-	
-	private static final int MAX_USER_LENGTH = 32;
+     * Unique identifier for serialization purposes.
+     */
+    private static final long serialVersionUID = 5788883283199993395L;
+
+    private static final int MAX_USER_LENGTH = 32;
     private static final int MAX_PASSWORD_LENGTH = 32;
     private static final int MIN_PASSWORD_LENGTH = 6;
 
@@ -60,17 +68,19 @@ public class User implements UserDetails, Identifiable {
     private List<GrantedAuthority> authorities;
 
     @Transient
-    private boolean beingFollowed;
+    private boolean canFollow;
 
-    @Override
-    @JsonIgnore
-	@Nonnull
-    public final Integer getId() {
-        return id;
+    protected User() {}
+
+    public User(final String name, final String pass) {
+        this.username = name;
+        this.password = pass;
     }
 
-    public final void setId(final Integer anId) {
-        this.id = anId;
+    @JsonIgnore
+    @Nonnull
+    public final Integer getId() {
+        return id;
     }
 
     @Override
@@ -131,26 +141,29 @@ public class User implements UserDetails, Identifiable {
         this.followedBy = followers;
     }
 
-    public final void setAuthorities(final List<GrantedAuthority> theAuthorities) {
+    public final void setAuthorities(
+            final List<GrantedAuthority> theAuthorities) {
         this.authorities = theAuthorities;
     }
 
-    public final boolean isBeingFollowed() {
-        return beingFollowed;
+    public final boolean canFollow() {
+        return canFollow;
     }
 
-    public final void setBeingFollowed(final boolean isBeingFollowed) {
-        this.beingFollowed = isBeingFollowed;
+    public final void setCanFollow(final boolean canIFollow) {
+        this.canFollow = canIFollow;
     }
 
-	@Override
-	public final boolean equals(final Object another) {
-		return (another == this) || another instanceof User && this.id.equals(((User) another).id);
-	}
+    @Override
+    public final boolean equals(final Object another) {
+        return (another == this)
+                || another instanceof User
+                && this.id.equals(((User) another).id);
+    }
 
-	@Override
-	public final int hashCode() {
-		return this.id;
-	}
+    @Override
+    public final int hashCode() {
+        return this.id;
+    }
 
 }

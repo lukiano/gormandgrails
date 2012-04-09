@@ -51,15 +51,18 @@
         <property name="rememberMeServices" ref="rememberMeServices" />
         <property name="authenticationManager" ref="authenticationManager" />
         <property name="filterProcessesUrl" value="/spring_security_login" />
-        <property name="authenticationFailureHandler">
-            <bean class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
-                <property name="defaultFailureUrl" value="/login?login_error=1" />
-            </bean>
-        </property>
-        <property name="authenticationSuccessHandler">
-            <bean class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
-                <property name="defaultTargetUrl" value="/t/home" />
-            </bean>
+        <property name="authenticationFailureHandler" ref="authenticationFailureHandler" />
+        <property name="authenticationSuccessHandler" ref="authenticationSuccessHandler" />
+    </bean>
+
+    <bean id="authenticationSuccessHandler" class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
+        <property name="defaultTargetUrl" value="/t/home" />
+    </bean>
+
+    <bean id="authenticationFailureHandler" class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+        <property name="defaultFailureUrl" value="/login?login_error=1" />
+        <property name="redirectStrategy">
+            <bean class="com.lucho.util.UsernameRedirectStrategy" />
         </property>
     </bean>
 
@@ -90,33 +93,6 @@
             "org.springframework.security.authentication.RememberMeAuthenticationProvider">
         <constructor-arg value="someRembemberMeKey"/>
     </bean>
-<!--
-    <bean id="delegatingEntryPoint" class="org.springframework.security.web.authentication.DelegatingAuthenticationEntryPoint">
-        <constructor-arg>
-            <map>
-               <entry value-ref="basicEntryPoint">
-                   <key>
-                       <bean class="org.springframework.security.web.util.AntPathRequestMatcher">
-                           <constructor-arg value="/springtwitter/t/shouldrefresh" />
-                       </bean>
-                   </key>
-               </entry>
-                <entry value-ref="basicEntryPoint">
-                    <key>
-                        <bean class="org.springframework.security.web.util.AntPathRequestMatcher">
-                            <constructor-arg value="/springtwitter/t/get" />
-                        </bean>
-                    </key>
-                </entry>
-            </map>
-        </constructor-arg>
-
-    </bean>
-
-    <bean id="loginEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
-        <constructor-arg value="/login"/>
-    </bean>
--->
 
     <bean id="basicEntryPoint" class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
         <property name="realmName" value="springTwitter" />

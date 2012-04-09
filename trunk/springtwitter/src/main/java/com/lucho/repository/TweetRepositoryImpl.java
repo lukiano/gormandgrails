@@ -4,7 +4,6 @@ import com.lucho.domain.QTweet;
 import com.lucho.domain.QUser;
 import com.lucho.domain.Tweet;
 import com.lucho.domain.User;
-import com.lucho.repository.TweetRepositoryCustom;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
@@ -15,11 +14,7 @@ import javax.persistence.Query;
 import java.util.List;
 
 /**
- * Created with IntelliJ IDEA.
- * User: luciano
- * Date: 4/3/12
- * Time: 11:27 PM
- * To change this template use File | Settings | File Templates.
+ * @author Luciano.Leggieri
  */
 public class TweetRepositoryImpl extends QueryDslRepositorySupport implements TweetRepositoryCustom {
 
@@ -34,7 +29,8 @@ public class TweetRepositoryImpl extends QueryDslRepositorySupport implements Tw
     }
 
     @Override
-    public Tweet newTweet(final User user, final String text, final String language) {
+    public Tweet newTweet(final User user, final String text,
+                          final String language) {
         Tweet tweet = new Tweet();
         tweet.setOwner(user);
         tweet.setTweet(text);
@@ -46,7 +42,8 @@ public class TweetRepositoryImpl extends QueryDslRepositorySupport implements Tw
 
     @Override
     public List<Tweet> searchTweets(final String textToSearch) {
-        FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(this.getEntityManager());
+        FullTextEntityManager fullTextEntityManager =
+                Search.getFullTextEntityManager(this.getEntityManager());
 
         // create native Lucene query using the query DSL
         // alternatively you can write the Lucene query using the Lucene query parser

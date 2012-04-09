@@ -2,7 +2,6 @@ package com.lucho.repository;
 
 import com.lucho.domain.QUser;
 import com.lucho.domain.User;
-import com.lucho.repository.UserRepositoryCustom;
 import org.springframework.data.jpa.repository.support.QueryDslRepositorySupport;
 
 import java.util.ArrayList;
@@ -11,12 +10,10 @@ import java.util.List;
 public class UserRepositoryImpl extends QueryDslRepositorySupport implements UserRepositoryCustom {
 
     @Override
-    public User addUser(String username, String password) {
+    public User addUser(final String username, final String password) {
         User newUser = null;
         if (!this.userExists(username)) {
-            User user = new User();
-            user.setUsername(username);
-            user.setPassword(password);
+            User user = new User(username, password);
             this.getEntityManager().persist(user);
             List<User> followedBy = user.getFollowedBy();
             if (followedBy == null) {
@@ -31,6 +28,7 @@ public class UserRepositoryImpl extends QueryDslRepositorySupport implements Use
         return newUser;
     }
 
+    @Override
     public boolean userExists(final String username) {
         QUser quser = QUser.user;
         return this.from(quser).where(quser.username.eq(username)).exists();

@@ -3,7 +3,8 @@ package com.lucho.service.impl;
 import com.lucho.domain.User;
 import com.lucho.repository.UserRepository;
 import com.lucho.service.UserService;
-import org.infinispan.util.concurrent.ConcurrentHashSet;
+import org.infinispan.api.BasicCacheContainer;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,26 +14,31 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ConcurrentMap;
 
 @Service("userService")
+@DependsOn("infinispanCacheManager")
+@Transactional
 public final class UserServiceImpl implements UserDetailsService, UserService {
 
-    private final ConcurrentHashSet<Integer> usersToBeRefreshed
-            = new ConcurrentHashSet<Integer>();
+    private final ConcurrentMap<Integer, Serializable> usersToBeRefreshed;
 
     private final UserRepository userRepository;
 
     @Inject
-    public UserServiceImpl(final UserRepository anUserRepository) {
+    public UserServiceImpl(final UserRepository anUserRepository,
+                           final BasicCacheContainer ecm) {
         this.userRepository = anUserRepository;
+        this.usersToBeRefreshed = ecm.getCache("refresher");
     }
 
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(final String username) {
-        User user = this.getUser(username);
+        User user = this.userRepository.findByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException(
                     "User " + username + " not found.");
@@ -43,52 +49,17 @@ public final class UserServiceImpl implements UserDetailsService, UserService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public User getUser(final Integer id) {
-        return this.userRepository.findOne(id);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public User getUser(final String username) {
-        return this.userRepository.findByUsername(username);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public boolean userExists(final String username) {
-        return this.userRepository.userExists(username);
-    }
-
-    @Override
-    @Transactional(readOnly = false)
-    public User addUser(final String username, final String password) {
-        return this.userRepository.addUser(username, password);
-    }
-
-    @Override
-    @Transactional
-    public void followUser(final User user, final User userToFollow) {
-        this.userRepository.followUser(user, userToFollow);
-    }
-
-    private boolean notFollowedBy(final User user, final User userToFollow) {
-        return this.userRepository.notFollowedBy(user, userToFollow);
-    }
-
-    @Override
-    @Transactional
     public void refreshFollowersFor(final Integer ownerId) {
         User user = this.userRepository.findOne(ownerId);
         List<User> followedByList = user.getFollowedBy();
         for (User follower : followedByList) {
-            usersToBeRefreshed.add(follower.getId());
+            usersToBeRefreshed.put(follower.getId(), Boolean.TRUE);
         }
     }
 
     @Override
     public boolean shouldRefresh(final User user) {
-        return usersToBeRefreshed.remove(user.getId());
+        return usersToBeRefreshed.remove(user.getId()) != null;
     }
 
 }

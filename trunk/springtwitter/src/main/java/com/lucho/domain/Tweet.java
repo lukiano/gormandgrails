@@ -4,6 +4,7 @@ import com.lucho.util.LanguageDiscriminator;
 import org.apache.solr.analysis.ASCIIFoldingFilterFactory;
 import org.apache.solr.analysis.LowerCaseFilterFactory;
 import org.apache.solr.analysis.SnowballPorterFilterFactory;
+import org.apache.solr.analysis.StandardFilterFactory;
 import org.apache.solr.analysis.StandardTokenizerFactory;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.annotations.Cache;
@@ -49,6 +50,8 @@ import javax.validation.constraints.Size;
                         StandardTokenizerFactory.class),
                 filters = {
                         @TokenFilterDef(factory =
+                                StandardFilterFactory.class),
+                        @TokenFilterDef(factory =
                                 ASCIIFoldingFilterFactory.class),
                         @TokenFilterDef(factory =
                                 LowerCaseFilterFactory.class),
@@ -64,6 +67,8 @@ import javax.validation.constraints.Size;
                         StandardTokenizerFactory.class),
                 filters = {
                         @TokenFilterDef(factory =
+                                StandardFilterFactory.class),
+                        @TokenFilterDef(factory =
                                 ASCIIFoldingFilterFactory.class),
                         @TokenFilterDef(factory =
                                 LowerCaseFilterFactory.class),
@@ -75,7 +80,7 @@ import javax.validation.constraints.Size;
                                 })
                 })
 })
-public class Tweet implements Identifiable {
+public class Tweet {
 
     private static final int MAX_TWEET_LENGTH = 140;
 
@@ -113,7 +118,6 @@ public class Tweet implements Identifiable {
         this.creationDate = theCreationDate;
     }
 
-    @Override
     @Nonnull
     public final Integer getId() {
         return id;

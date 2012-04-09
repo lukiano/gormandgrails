@@ -28,11 +28,19 @@
     <logger name="org.springframework.beans.PropertyEditorRegistrySupport">
         <level value="debug"/>
     </logger>
- 
-    <logger name="org.acegisecurity">
-        <level value="info"/>
-    </logger>
     -->
+
+    <logger name="org.springframework">
+        <level value="debug"/>
+    </logger>
+
+    <logger name="org.hibernate">
+        <level value="debug"/>
+    </logger>
+
+    <logger name="com.lucho">
+        <level value="debug"/>
+    </logger>
 
     <!-- the root category -->
     <root>
@@ -40,7 +48,7 @@
             all log messages of level "debug" or higher will be logged, unless defined otherwise 
             all log messages will be logged to the appender "stdout", unless defined otherwise 
         -->
-        <level value="debug" />
+        <level value="info" />
         <appender-ref ref="stdout" />
     </root>
 </log4j:configuration>

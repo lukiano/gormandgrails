@@ -24,7 +24,7 @@
                 <label for="j_username">User:</label>
                 <br/>
                 <input type="text" name="j_username" id="j_username"
-                       <c:if test="${not empty param.login_error}">value="<%= session.getAttribute(UsernamePasswordAuthenticationFilter.SPRING_SECURITY_LAST_USERNAME_KEY) %>"
+                       <c:if test="${not empty param.login_error}">value="<%= request.getParameter("login_name") %>"
                 </c:if> />
             </p>
             <p>
