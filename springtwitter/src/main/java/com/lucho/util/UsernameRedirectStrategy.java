@@ -8,26 +8,33 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * Created with IntelliJ IDEA.
- * User: luciano
- * Date: 4/5/12
- * Time: 12:49 PM
- * To change this template use File | Settings | File Templates.
+ * @author Luciano.Leggieri
  */
-public class UsernameRedirectStrategy extends DefaultRedirectStrategy {
+public final class UsernameRedirectStrategy extends DefaultRedirectStrategy {
 
+    /**
+     * Key name that holds the last user name.
+     */
+    private static final String NAME_KEY = "login_name";
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sendRedirect(final HttpServletRequest request,
-                             final HttpServletResponse response, final String url) throws IOException {
-        String username = request.getParameter(UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_USERNAME_KEY);
+                             final HttpServletResponse response,
+                             final String url) throws IOException {
+        String username = request.getParameter(
+                UsernamePasswordAuthenticationFilter
+                        .SPRING_SECURITY_FORM_USERNAME_KEY);
         if (username == null) {
             super.sendRedirect(request, response, url);
         } else {
             String newUrl;
             if (url.indexOf('?') >= 0) {
-                newUrl = url + "&login_name=" + username;
+                newUrl = url + "&" + NAME_KEY + "=" + username;
             } else {
-                newUrl = url + "?login_name=" + username;
+                newUrl = url + "?" + NAME_KEY + "=" + username;
             }
             super.sendRedirect(request, response, newUrl);
         }

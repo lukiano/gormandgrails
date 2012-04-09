@@ -5,6 +5,7 @@ import org.hibernate.search.analyzer.Discriminator;
 
 /**
  * Class used to get the right Lucene Analyzer for the tweet language.
+ * @author Luciano.Leggieri
  */
 public final class LanguageDiscriminator implements Discriminator {
 

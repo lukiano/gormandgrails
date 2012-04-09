@@ -19,20 +19,41 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
 
+/**
+ * {@link UserService} default implementation.
+ * @author Luciano.Leggieri
+ */
 @Service("userService")
 @DependsOn("infinispanCacheManager")
 @Transactional
 public final class UserServiceImpl implements UserDetailsService, UserService {
 
+    /**
+     * Map that holds the ids of the Users whose tweet line needs
+     * to be refreshed.
+     */
     private final ConcurrentMap<Integer, Serializable> usersToBeRefreshed;
 
+    /**
+     * User repository implementation.
+     */
     private final UserRepository userRepository;
 
+    /**
+     * Name of the Transactional Cache used as a {@link ConcurrentMap}.
+     */
+    public static final String CACHE_NAME = "refresher";
+
+    /**
+     * Class constructor.
+     * @param anUserRepository injects user repository implementation.
+     * @param ecm injects container used to get the Cache Map.
+     */
     @Inject
     public UserServiceImpl(final UserRepository anUserRepository,
                            final BasicCacheContainer ecm) {
         this.userRepository = anUserRepository;
-        this.usersToBeRefreshed = ecm.getCache("refresher");
+        this.usersToBeRefreshed = ecm.getCache(CACHE_NAME);
     }
 
     @Override

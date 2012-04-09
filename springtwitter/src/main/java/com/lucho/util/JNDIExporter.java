@@ -7,7 +7,8 @@ import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 
 /**
- * Class that export a Spring bean to JNDI.
+ * Exports a Spring bean to JNDI.
+ * @author Luciano.Leggieri
  */
 public final class JNDIExporter implements InitializingBean {
 

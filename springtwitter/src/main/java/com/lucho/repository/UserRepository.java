@@ -6,15 +6,19 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 
 /**
  * Repository that handles User objects.
+ *
+ * @author Luciano.Leggieri
  */
-public interface UserRepository extends JpaRepository<User, Integer>, UserRepositoryCustom, QueryDslPredicateExecutor {
+public interface UserRepository extends JpaRepository<User, Integer>,
+        UserRepositoryCustom, QueryDslPredicateExecutor {
 
     /**
      * Find a user by its username.
+     *
      * @param username the name of the user to find.
      * @return a User object that holds the username information or null
-     * if no user with that name exists.
+     *         if no user with that name exists.
      */
-	User findByUsername(String username);
+    User findByUsername(String username);
 
 }

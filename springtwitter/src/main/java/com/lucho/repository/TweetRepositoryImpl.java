@@ -14,32 +14,39 @@ import javax.persistence.Query;
 import java.util.List;
 
 /**
+ * Default {@link TweetRepository} implementation.
  * @author Luciano.Leggieri
  */
-public class TweetRepositoryImpl extends QueryDslRepositorySupport implements TweetRepositoryCustom {
+public class TweetRepositoryImpl extends QueryDslRepositorySupport
+        implements TweetRepositoryCustom {
 
     private static final int MAX_RESULTS = 20;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public List<Tweet> getTweetsForUserIncludingFollows(final User user) {
+    public final List<Tweet> getTweetsForUserIncludingFollows(final User user) {
         QTweet qtweet = QTweet.tweet1;
         QUser followedBy = new QUser("followedBy");
         return this.from(qtweet).join(qtweet.owner.followedBy, followedBy)
                 .where(followedBy.id.eq(user.getId())).limit(MAX_RESULTS).list(qtweet);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public Tweet newTweet(final User user, final String text,
+    public final Tweet newTweet(final User user, final String text,
                           final String language) {
-        Tweet tweet = new Tweet();
-        tweet.setOwner(user);
-        tweet.setTweet(text);
-        tweet.setLanguage(language);
-        tweet.setCreationDate(new DateTime());
+        Tweet tweet = new Tweet(user, text, language);
         this.getEntityManager().persist(tweet);
         return tweet;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Tweet> searchTweets(final String textToSearch) {
         FullTextEntityManager fullTextEntityManager =
