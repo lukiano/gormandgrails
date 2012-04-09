@@ -7,7 +7,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.annotation.Nonnull;
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,7 +16,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Collection;
 import java.util.List;
@@ -47,13 +45,11 @@ public class User implements UserDetails {
     @JsonIgnore
     private Integer id;
 
-    @NotNull
     @NotEmpty
     @Size(max = MAX_USER_LENGTH)
     @Column(name = "username")
     private String username;
 
-    @NotNull
     @NotEmpty
     @Size(min = MIN_PASSWORD_LENGTH, max = MAX_PASSWORD_LENGTH)
     @JsonIgnore
@@ -88,7 +84,6 @@ public class User implements UserDetails {
     }
 
     @JsonIgnore
-    @Nonnull
     public final Integer getId() {
         return id;
     }

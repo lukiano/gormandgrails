@@ -11,7 +11,7 @@
 		<spring.version>3.1.1.RELEASE</spring.version>
 		<spring.security.version>3.1.0.RELEASE</spring.security.version>
 		<spring.integration.version>2.1.0.RELEASE</spring.integration.version>
-		<atomikos.version>3.7.0</atomikos.version>
+		<bitronix.version>2.1.2</bitronix.version>
 		<tiles.version>2.2.2</tiles.version>
 		<slf4j.version>1.6.4</slf4j.version>
 		<jackson.version>1.9.3</jackson.version>
@@ -80,6 +80,7 @@
         </dependency>
 
 		<!-- aspects -->
+        <!--
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-instrument</artifactId>
@@ -91,6 +92,7 @@
 			<version>${spring.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		-->
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjrt</artifactId>
@@ -241,34 +243,7 @@
 		<dependency>
 			<groupId>org.codehaus.btm</groupId>
 			<artifactId>btm</artifactId>
-			<version>2.1.2</version>
-		</dependency>
-
-		<!-- Atomikos Transactions -->
-		<dependency>
-			<groupId>com.atomikos</groupId>
-			<artifactId>transactions</artifactId>
-			<version>${atomikos.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.atomikos</groupId>
-			<artifactId>transactions-jta</artifactId>
-			<version>${atomikos.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.atomikos</groupId>
-			<artifactId>transactions-jms</artifactId>
-			<version>${atomikos.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.atomikos</groupId>
-			<artifactId>transactions-hibernate3</artifactId>
-			<version>${atomikos.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.atomikos</groupId>
-			<artifactId>transactions-jdbc</artifactId>
-			<version>${atomikos.version}</version>
+			<version>${bitronix.version}</version>
 		</dependency>
 
 		<!-- SLF4j logging -->
@@ -526,7 +501,7 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.5</version>
                 <configuration>
-                    <encoding>UTF-8</encoding>
+                    <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
             <plugin>

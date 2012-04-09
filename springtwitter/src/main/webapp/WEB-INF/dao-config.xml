@@ -13,6 +13,8 @@
         <property name="location" value="classpath:application.properties"/>
     </bean>
 
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean" />
+
     <util:properties id="jdbcConfiguration" location="classpath:jdbcdatasource.properties"/>
     <util:properties id="hibernateProperties" location="classpath:hibernate.properties"/>
 
@@ -36,6 +38,13 @@
         <property name="persistenceUnitName" value="springtwitter" />
         <!-- IMPORTANT: make sure to tell Hibernate to use JTA -->
         <property name="jpaProperties" ref="hibernateProperties" />
+        <property name="jpaPropertyMap">
+            <map>
+                <entry key="javax.persistence.validation.factory" value-ref="validator" />
+            </map>
+
+        </property>
+
         <property name="persistenceUnitPostProcessors">
             <bean class="com.lucho.util.JtaPersistenceUnitPostProcessor" />
         </property>

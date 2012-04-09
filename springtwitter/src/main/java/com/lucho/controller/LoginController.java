@@ -4,15 +4,21 @@ import com.lucho.domain.User;
 import com.lucho.repository.UserRepository;
 import org.springframework.context.MessageSource;
 import org.springframework.context.support.MessageSourceAccessor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.inject.Inject;
+import javax.persistence.PersistenceException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
@@ -47,34 +53,57 @@ public final class LoginController {
         this.messages = new MessageSourceAccessor(aMessageSource);
     }
 
-    /**
-     * Creates a new user with the specified user name and password.
-     * @param username the name of the new user.
-     * @param password the password for the new user.
-     * @return a string detailing success or failure.
-     */
+    @ExceptionHandler(PersistenceException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handlePersistenceException(final PersistenceException pe) {
+        String returnMessage;
+        if (pe.getCause()
+                instanceof ConstraintViolationException) {
+            ConstraintViolationException cve =
+                    (ConstraintViolationException) pe.getCause();
+            ConstraintViolation<?> cv =
+                    cve.getConstraintViolations().iterator().next();
+            returnMessage = cv.getMessage();
+        } else {
+            returnMessage = pe.getLocalizedMessage();
+        }
+        return returnMessage;
+    }
+
+    @ExceptionHandler(TransactionException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleTransactionException(final TransactionException te) {
+        String returnMessage;
+        if (te.getMostSpecificCause()
+                instanceof ConstraintViolationException) {
+            ConstraintViolationException cve =
+                    (ConstraintViolationException) te.getMostSpecificCause();
+            ConstraintViolation<?> cv =
+                    cve.getConstraintViolations().iterator().next();
+            returnMessage = cv.getMessage();
+        } else {
+            returnMessage = te.getLocalizedMessage();
+        }
+        return returnMessage;
+    }
+
+        /**
+        * Creates a new user with the specified user name and password.
+        * @param username the name of the new user.
+        * @param password the password for the new user.
+        * @return a string detailing success or failure.
+        */
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     @ResponseBody
     public String register(final String username, final String password) {
         String returnMessage;
-        try {
-            User newUser = this.userRepository.addUser(username, password);
-            if (newUser == null) {
-                returnMessage = messages.getMessage("login.register.failure");
-            } else {
-                returnMessage = messages.getMessage("login.register.success");
-            }
-        } catch (TransactionException e) {
-            if (e.getMostSpecificCause()
-                    instanceof ConstraintViolationException) {
-                ConstraintViolationException cve =
-                        (ConstraintViolationException) e.getMostSpecificCause();
-                ConstraintViolation<?> cv =
-                        cve.getConstraintViolations().iterator().next();
-                returnMessage = cv.getMessage();
-            } else {
-                throw e;
-            }
+        User newUser = this.userRepository.addUser(username, password);
+        if (newUser == null) {
+            returnMessage = messages.getMessage("login.register.failure");
+        } else {
+            returnMessage = messages.getMessage("login.register.success");
         }
         return returnMessage;
     }

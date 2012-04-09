@@ -99,7 +99,10 @@ function ready() {
             searchText();
         }
     });
+    $("#inputBox").ajaxError(function (e, jqxhr, settings, exception) {
+        $(this).text("Triggered ajaxError handler.");
+    });
     getTweets();
-    setInterval(checkForNewTweets, 5000);
+    setInterval(checkForNewTweets, 10000);
 }
 
