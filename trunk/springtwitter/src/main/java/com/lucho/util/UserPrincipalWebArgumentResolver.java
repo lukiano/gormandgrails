@@ -10,6 +10,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import javax.servlet.http.HttpServletRequest;
 
 /**
+ * Gets the current User domain object from the {@link Principal}.
  * @author Luciano.Leggieri
  */
 public final class UserPrincipalWebArgumentResolver

@@ -17,34 +17,56 @@ import javax.inject.Inject;
 import java.util.List;
 
 /**
+ * MVC Controller for Tweet operations.
+ *
  * @author Luciano.Leggieri
  */
 @Transactional
 @Controller
 public final class TweetController {
 
+    /**
+     * TweetRepository implementation.
+     */
     private final TweetRepository tweetRepository;
 
+    /**
+     * Only Class Constructor.
+     *
+     * @param tr TweetRepository implementation.
+     */
     @Inject
     public TweetController(final TweetRepository tr) {
         this.tweetRepository = tr;
     }
 
-    @Secured( {"ROLE_USER"} )
+    /**
+     * Creates a new tweet.
+     * @param user logged in User.
+     * @param text the text that will go in the new tweet.
+     * @return a new Tweet with the desired text.
+     */
+    @Secured({ "ROLE_USER" })
     @Publisher(channel = "newTweetNotificationChannel")
     @RequestMapping(value = "/t/new", method = RequestMethod.POST)
     @ResponseBody
     public Tweet newTweet(@Principal final User user, final String text) {
         String language = LocaleContextHolder.getLocale().getLanguage();
-        Tweet newTweet = this.tweetRepository.newTweet(user, text, language);
+        return this.tweetRepository.newTweet(user, text, language);
         /*
         Message<Tweet> message = MessageBuilder.withPayload(newTweet).build();
         this.messagingTemplate.send("newTweetNotificationChannel", message);
-        */
         return newTweet;
+        */
     }
 
-    @Secured( {"ROLE_USER"} )
+    /**
+     * Finds tweets that contain a certain text.
+     * @param user logged in User.
+     * @param textToSearch text string to search.
+     * @return a list with tweets that have the text in their contents.
+     */
+    @Secured({ "ROLE_USER" })
     @RequestMapping(value = "/t/search", method = RequestMethod.GET)
     @ResponseBody
     public List<Tweet> searchInTweets(@Principal final User user,
@@ -58,7 +80,13 @@ public final class TweetController {
         return tweetList;
     }
 
-    @Secured( {"ROLE_USER"} )
+    /**
+     * Gets the User's tweet line.
+     * @param user logged in User.
+     * @return a lists with the User's tweets and those
+     * of the ones it follows.
+     */
+    @Secured({ "ROLE_USER" })
     @RequestMapping(value = "/t/get", method = RequestMethod.GET)
     @ResponseBody
     public List<Tweet> getTweets(@Principal final User user) {

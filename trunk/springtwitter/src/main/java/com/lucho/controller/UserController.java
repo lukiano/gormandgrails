@@ -4,6 +4,7 @@ import com.lucho.domain.User;
 import com.lucho.repository.UserRepository;
 import com.lucho.service.UserService;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,6 +17,7 @@ import javax.inject.Inject;
  *
  * @author Luciano.Leggieri
  */
+@Transactional
 @Controller
 public final class UserController {
 

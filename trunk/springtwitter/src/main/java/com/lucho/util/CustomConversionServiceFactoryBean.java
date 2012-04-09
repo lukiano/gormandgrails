@@ -8,6 +8,7 @@ import org.springframework.format.support.DefaultFormattingConversionService;
 /**
  * Adds {@link DomainClassConverter}
  * to the list of default registered converters.
+ * @author Luciano.Leggieri
  */
 public final class CustomConversionServiceFactoryBean
         extends ConversionServiceFactoryBean {

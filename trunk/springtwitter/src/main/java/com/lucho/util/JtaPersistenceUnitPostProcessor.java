@@ -6,7 +6,8 @@ import org.springframework.orm.jpa.persistenceunit.PersistenceUnitPostProcessor;
 import javax.persistence.spi.PersistenceUnitTransactionType;
 
 /**
- * @author Luciano Leggieri
+ * Injects the DataSource as a JTA DataSource in the JPA Persistence Unit.
+ * @author Luciano.Leggieri
  */
 public final class JtaPersistenceUnitPostProcessor
         implements PersistenceUnitPostProcessor {

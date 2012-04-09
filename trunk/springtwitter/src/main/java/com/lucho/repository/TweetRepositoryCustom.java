@@ -7,15 +7,18 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * Created with IntelliJ IDEA.
- * User: luciano
- * Date: 4/3/12
- * Time: 11:21 PM
- * To change this template use File | Settings | File Templates.
+ * Extension for Tweet Repository.
+ *
+ * @author Luciano.Leggieri
  */
 @Transactional
 public interface TweetRepositoryCustom {
 
+    /**
+     *
+     * @param user
+     * @return
+     */
     @Transactional(readOnly = true)
     List<Tweet> getTweetsForUserIncludingFollows(User user);
 

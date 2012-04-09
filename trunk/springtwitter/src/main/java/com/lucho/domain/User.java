@@ -70,8 +70,18 @@ public class User implements UserDetails {
     @Transient
     private boolean canFollow;
 
-    protected User() {}
+    /**
+     * Default Class Constructor.
+     */
+    protected User() {
 
+    }
+
+    /**
+     * Creates a new User filling the obligatory fields.
+     * @param name User name.
+     * @param pass User password.
+     */
     public User(final String name, final String pass) {
         this.username = name;
         this.password = pass;

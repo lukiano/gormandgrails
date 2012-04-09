@@ -6,6 +6,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.TransactionException;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,8 +18,10 @@ import javax.validation.ConstraintViolationException;
 
 /**
  * Controller that provides login related endpoints.
+ *
  * @author Luciano.Leggieri
  */
+@Transactional
 @Controller
 public final class LoginController {
 

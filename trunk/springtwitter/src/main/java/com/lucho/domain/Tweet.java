@@ -82,14 +82,23 @@ import javax.validation.constraints.Size;
 })
 public class Tweet {
 
+    /**
+     * Maximum length for a tweet text.
+     */
     private static final int MAX_TWEET_LENGTH = 140;
 
+    /**
+     * Tweet id.
+     */
     @Id
     @GeneratedValue
     @JsonIgnore
     @DocumentId
     private Integer id;
 
+    /**
+     * Tweet text.
+     */
     @NotNull
     @NotEmpty
     @Size(max = MAX_TWEET_LENGTH)
@@ -97,10 +106,16 @@ public class Tweet {
             termVector = TermVector.WITH_POSITION_OFFSETS)
     private String tweet;
 
+    /**
+     * Tweet language.
+     */
     @Field
     @AnalyzerDiscriminator(impl = LanguageDiscriminator.class)
     private String language;
 
+    /**
+     * Tweet owner.
+     */
     @NotNull
     @ManyToOne
     private User owner;
@@ -109,6 +124,26 @@ public class Tweet {
     @Past
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime creationDate;
+
+    /**
+     * Default Class Constructor.
+     */
+    protected Tweet() {
+
+    }
+
+    /**
+     * Creates a new Tweet filling the obligatory fields.
+     * @param user Tweet owner.
+     * @param text Tweet contents.
+     * @param lang Tweet language.
+     */
+    public Tweet(final User user, final String text, final String lang) {
+        this.owner = user;
+        this.tweet = text;
+        this.language = lang;
+        this.creationDate = new DateTime();
+    }
 
     public DateTime getCreationDate() {
         return creationDate;

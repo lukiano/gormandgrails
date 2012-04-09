@@ -6,8 +6,8 @@ import org.infinispan.transaction.lookup.TransactionManagerLookup;
 import javax.transaction.TransactionManager;
 
 /**
- * Return the Bitronix Transaction Manager.
- *
+ * Returns the Bitronix Transaction Manager.
+ * @author Luciano.Leggieri
  * @see TransactionManagerServices
  */
 public final class BitronixTransactionManagerLookup
