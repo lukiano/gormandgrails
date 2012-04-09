@@ -1,10 +1,10 @@
 function buildHtml(tweet) {
     "use strict";
     var html;
-    if (tweet.owner.beingFollowed) {
+    if (tweet.owner.canFollow) {
         html = "<span><p>User: " + tweet.owner.username + " - Creation date: " + tweet.creationDate + "</p><p>" + tweet.tweet + "</p></span><hr/>";
     } else {
-        html = "<span><p>User: <a href='follow?name=" + tweet.owner.username + "'>" + tweet.owner.username + "</a> - Creation date: " + tweet.creationDate + "</p><p>" + tweet.tweet + "</p></span><hr/>";
+        html = "<span><p>User: <a href='follow?id=" + tweet.owner.id + "'>" + tweet.owner.username + "</a> - Creation date: " + tweet.creationDate + "</p><p>" + tweet.tweet + "</p></span><hr/>";
     }
     return html;
 }

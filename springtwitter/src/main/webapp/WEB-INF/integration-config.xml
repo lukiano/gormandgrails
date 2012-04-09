@@ -11,7 +11,9 @@
         http://www.springframework.org/schema/integration/jms
         http://www.springframework.org/schema/integration/jms/spring-integration-jms-2.1.xsd">
 
-    <int:annotation-config/>
+    <int:annotation-config />
+
+    <bean id="messageTemplate" class="org.springframework.integration.core.MessagingTemplate" />
 
     <int:channel id="newTweetNotificationChannel" /> <!-- outbound channel -->
     <int:transformer input-channel="newTweetNotificationChannel"

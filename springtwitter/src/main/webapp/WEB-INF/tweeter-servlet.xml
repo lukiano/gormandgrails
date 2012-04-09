@@ -13,7 +13,13 @@
 
     <context:component-scan base-package="com.lucho.controller"/>
     <mvc:default-servlet-handler/>
-    <mvc:annotation-driven />
+    <mvc:annotation-driven conversion-service="conversionService">
+        <mvc:argument-resolvers>
+            <bean class="com.lucho.util.UserPrincipalWebArgumentResolver" />
+        </mvc:argument-resolvers>
+    </mvc:annotation-driven>
+
+    <bean id="conversionService" class="com.lucho.util.CustomConversionServiceFactoryBean" />
 
     <!-- Resolves logical view names returned by Controllers to Tiles; a view name to resolve is treated as the name of a tiles definition -->
     <bean id="tilesViewResolver" class="org.springframework.web.servlet.view.tiles2.TilesViewResolver">

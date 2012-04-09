@@ -1,7 +1,7 @@
 package com.lucho.controller;
 
 import com.lucho.domain.User;
-import com.lucho.service.UserService;
+import com.lucho.repository.UserRepository;
 import org.springframework.context.MessageSource;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.stereotype.Controller;
@@ -25,7 +25,7 @@ public final class LoginController {
     /**
      * User service.
      */
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     /**
      * I18n messages.
@@ -34,13 +34,13 @@ public final class LoginController {
 
     /**
      * Class constructor.
-     * @param anUserService user service.
+     * @param anUserRepository user repository.
      * @param aMessageSource i18n messages.
      */
     @Inject
-    public LoginController(final UserService anUserService,
+    public LoginController(final UserRepository anUserRepository,
                            final MessageSource aMessageSource) {
-        this.userService = anUserService;
+        this.userRepository = anUserRepository;
         this.messages = new MessageSourceAccessor(aMessageSource);
     }
 
@@ -55,7 +55,7 @@ public final class LoginController {
     public String register(final String username, final String password) {
         String returnMessage;
         try {
-            User newUser = this.userService.addUser(username, password);
+            User newUser = this.userRepository.addUser(username, password);
             if (newUser == null) {
                 returnMessage = messages.getMessage("login.register.failure");
             } else {
@@ -86,7 +86,7 @@ public final class LoginController {
     @ResponseBody
     public String exists(@RequestParam(value = "name") final String username) {
         String message;
-        if (this.userService.userExists(username)) {
+        if (this.userRepository.userExists(username)) {
             message = messages.getMessage("login.username.exists");
         } else {
             message = messages.getMessage("login.username.free");
