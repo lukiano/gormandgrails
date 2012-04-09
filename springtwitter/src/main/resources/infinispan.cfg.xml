@@ -226,7 +226,7 @@
 					-->
                     <property name="connectionFactoryClass"
                               value="org.infinispan.loaders.jdbc.connectionfactory.PooledConnectionFactory"/>
-                    <property name="connectionUrl" value="jdbc:h2:/Users/luciano/workspace3/springtwitter/h2data;LOCK_MODE=1"/>
+                    <property name="connectionUrl" value="jdbc:h2:nioMapped:/Users/luciano/workspace3/springtwitter/h2data"/>
                     <property name="driverClass" value="org.h2.Driver"/>
                     <property name="userName" value="javajava" />
                     <property name="password" value="javajava" />
@@ -273,7 +273,7 @@
 					-->
                     <property name="connectionFactoryClass"
                               value="org.infinispan.loaders.jdbc.connectionfactory.PooledConnectionFactory"/>
-                    <property name="connectionUrl" value="jdbc:h2:/Users/luciano/workspace3/springtwitter/h2data;LOCK_MODE=1"/>   <!-- LOCK MODE = 1 means SERIALIZABLE isolation level -->
+                    <property name="connectionUrl" value="jdbc:h2:nioMapped:/Users/luciano/workspace3/springtwitter/h2data"/>   <!-- LOCK MODE = 1 means SERIALIZABLE isolation level -->
                     <property name="driverClass" value="org.h2.Driver"/>
                     <property name="userName" value="javajava" />
                     <property name="password" value="javajava" />
