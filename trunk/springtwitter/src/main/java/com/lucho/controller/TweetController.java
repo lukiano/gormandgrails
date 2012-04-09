@@ -4,16 +4,23 @@ import com.lucho.domain.Tweet;
 import com.lucho.domain.User;
 import com.lucho.repository.TweetRepository;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.http.HttpStatus;
 import org.springframework.integration.annotation.Publisher;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.inject.Inject;
+import javax.persistence.PersistenceException;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.util.List;
 
 /**
@@ -43,21 +50,58 @@ public final class TweetController {
     /**
      * Creates a new tweet.
      * @param user logged in User.
-     * @param text the text that will go in the new tweet.
+     * @param tweet the text that will go in the new tweet.
      * @return a new Tweet with the desired text.
      */
     @Secured({ "ROLE_USER" })
     @Publisher(channel = "newTweetNotificationChannel")
     @RequestMapping(value = "/t/new", method = RequestMethod.POST)
     @ResponseBody
-    public Tweet newTweet(@Principal final User user, final String text) {
+    public Tweet newTweet(@Principal final User user,
+                          @RequestParam(value = "tweet") final String tweet) {
         String language = LocaleContextHolder.getLocale().getLanguage();
-        return this.tweetRepository.newTweet(user, text, language);
+        return this.tweetRepository.newTweet(user, tweet, language);
         /*
         Message<Tweet> message = MessageBuilder.withPayload(newTweet).build();
         this.messagingTemplate.send("newTweetNotificationChannel", message);
         return newTweet;
         */
+    }
+
+    @ExceptionHandler(PersistenceException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handlePersistenceException(final PersistenceException pe) {
+        String returnMessage;
+        if (pe.getCause()
+                instanceof ConstraintViolationException) {
+            ConstraintViolationException cve =
+                    (ConstraintViolationException) pe.getCause();
+            ConstraintViolation<?> cv =
+                    cve.getConstraintViolations().iterator().next();
+            returnMessage = cv.getMessage();
+        } else {
+            returnMessage = pe.getLocalizedMessage();
+        }
+        return returnMessage;
+    }
+
+    @ExceptionHandler(TransactionException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleTransactionException(final TransactionException te) {
+        String returnMessage;
+        if (te.getMostSpecificCause()
+                instanceof ConstraintViolationException) {
+            ConstraintViolationException cve =
+                    (ConstraintViolationException) te.getMostSpecificCause();
+            ConstraintViolation<?> cv =
+                    cve.getConstraintViolations().iterator().next();
+            returnMessage = cv.getMessage();
+        } else {
+            returnMessage = te.getLocalizedMessage();
+        }
+        return returnMessage;
     }
 
     /**

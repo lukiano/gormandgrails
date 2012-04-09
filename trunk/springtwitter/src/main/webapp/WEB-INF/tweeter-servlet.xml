@@ -18,7 +18,7 @@
             <property name="paramName" value="lang" />
         </bean>
     </mvc:interceptors>
-    <mvc:annotation-driven conversion-service="conversionService">
+    <mvc:annotation-driven conversion-service="conversionService" validator="validator">
         <mvc:argument-resolvers>
             <bean class="com.lucho.util.UserPrincipalWebArgumentResolver" />
         </mvc:argument-resolvers>

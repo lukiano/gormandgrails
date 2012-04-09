@@ -81,8 +81,6 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework:spring-test:3.1.1.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-aspects:3.1.1.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: javax.inject:javax.inject:1" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-instrument:3.1.1.RELEASE" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.springframework:spring-instrument-tomcat:3.1.1.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.aspectj:aspectjrt:1.6.12" level="project" />
     <orderEntry type="library" name="Maven: org.aspectj:aspectjweaver:1.6.12" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-core:3.1.0.RELEASE" level="project" />
@@ -159,13 +157,6 @@
     <orderEntry type="library" name="Maven: commons-pool:commons-pool:1.5.4" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.btm:btm:2.1.2" level="project" />
     <orderEntry type="library" name="Maven: javax.transaction:jta:1.1" level="project" />
-    <orderEntry type="library" name="Maven: com.atomikos:transactions:3.7.0" level="project" />
-    <orderEntry type="library" name="Maven: com.atomikos:transactions-api:3.7.0" level="project" />
-    <orderEntry type="library" name="Maven: com.atomikos:atomikos-util:3.7.0" level="project" />
-    <orderEntry type="library" name="Maven: com.atomikos:transactions-jta:3.7.0" level="project" />
-    <orderEntry type="library" name="Maven: com.atomikos:transactions-jms:3.7.0" level="project" />
-    <orderEntry type="library" name="Maven: com.atomikos:transactions-hibernate3:3.7.0" level="project" />
-    <orderEntry type="library" name="Maven: com.atomikos:transactions-jdbc:3.7.0" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:log4j-over-slf4j:1.6.4" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:jul-to-slf4j:1.6.4" level="project" />
     <orderEntry type="library" name="Maven: ch.qos.logback:logback-classic:1.0.1" level="project" />

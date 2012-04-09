@@ -26,7 +26,6 @@ import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.DateTime;
 
-import javax.annotation.Nonnull;
 import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -101,7 +100,6 @@ public class Tweet {
     /**
      * Tweet text.
      */
-    @NotNull
     @NotEmpty
     @Size(max = MAX_TWEET_LENGTH)
     @Field(index = Index.YES, store = Store.COMPRESS,
@@ -155,7 +153,6 @@ public class Tweet {
         this.creationDate = theCreationDate;
     }
 
-    @Nonnull
     public final Integer getId() {
         return id;
     }
