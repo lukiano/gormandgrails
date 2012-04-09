@@ -1,10 +1,12 @@
 function buildHtml(tweet) {
     "use strict";
-    var html;
+    var html, date, dateString;
+    date = new Date(tweet.creationDate);
+    dateString = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDay() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
     if (tweet.owner.canFollow) {
-        html = "<span><p>User: " + tweet.owner.username + " - Creation date: " + tweet.creationDate + "</p><p>" + tweet.tweet + "</p></span><hr/>";
+        html = "<span><p>User: " + tweet.owner.username + " - Creation date: " + dateString + "</p><p>" + tweet.tweet + "</p></span><hr/>";
     } else {
-        html = "<span><p>User: <a href='follow?id=" + tweet.owner.id + "'>" + tweet.owner.username + "</a> - Creation date: " + tweet.creationDate + "</p><p>" + tweet.tweet + "</p></span><hr/>";
+        html = "<span><p>User: <a href='follow?id=" + tweet.owner.id + "'>" + tweet.owner.username + "</a> - Creation date: " + dateString + "</p><p>" + tweet.tweet + "</p></span><hr/>";
     }
     return html;
 }
