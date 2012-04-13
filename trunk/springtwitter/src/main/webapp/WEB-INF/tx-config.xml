@@ -33,10 +33,14 @@
 		<property name="allowCustomIsolationLevels" value="true" />
 	</bean>
  	-->
+    <!--
+    <bean id="bitronixInfinispanLoader"
+          class="bitronix.tm.resource.infinispan.BitronixInfinispanLoader" />
+     -->
 
 	<!-- Bitronix Transaction Manager embedded configuration -->
 	<bean id="btmConfig" factory-method="getConfiguration"
-		class="bitronix.tm.TransactionManagerServices">
+		class="bitronix.tm.TransactionManagerServices" >
 		<property name="serverId" value="spring-btm" />
 	</bean>
 

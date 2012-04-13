@@ -8,7 +8,7 @@
         http://www.springframework.org/schema/security
         http://www.springframework.org/schema/security/spring-security-3.1.xsd">
 
-    <sec:http auto-config='false' entry-point-ref="basicEntryPoint">
+    <sec:http auto-config='false' entry-point-ref="basicEntryPoint" >
         <sec:intercept-url pattern="/login" access="ROLE_ANONYMOUS,ROLE_USER"/>
         <sec:intercept-url pattern="/signup" access="ROLE_ANONYMOUS"/>
         <sec:intercept-url pattern="/t/**" access="ROLE_USER"/>
@@ -21,7 +21,7 @@
         <!-- <sec:http-basic /> -->
     </sec:http>
 
-    <sec:global-method-security secured-annotations="enabled"/>
+    <sec:global-method-security secured-annotations="enabled" mode="aspectj" />
 
     <sec:authentication-manager alias="authenticationManager">
         <sec:authentication-provider ref="rememberMeAuthenticationProvider" />
