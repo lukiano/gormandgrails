@@ -4,6 +4,7 @@ import com.lucho.domain.QTweet;
 import com.lucho.domain.QUser;
 import com.lucho.domain.Tweet;
 import com.lucho.domain.User;
+import com.mysema.query.types.OrderSpecifier;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
@@ -30,7 +31,10 @@ public class TweetRepositoryImpl extends QueryDslRepositorySupport
         QTweet qtweet = QTweet.tweet1;
         QUser followedBy = new QUser("followedBy");
         return this.from(qtweet).join(qtweet.owner.followedBy, followedBy)
-                .where(followedBy.id.eq(user.getId())).limit(MAX_RESULTS).list(qtweet);
+                .where(followedBy.id.eq(user.getId()))
+                .orderBy(qtweet.creationDate.desc())
+                .limit(MAX_RESULTS)
+                .list(qtweet);
     }
 
     /**

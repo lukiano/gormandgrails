@@ -5,7 +5,10 @@ import com.lucho.domain.User;
 import com.lucho.repository.TweetRepository;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
+import org.springframework.integration.Message;
 import org.springframework.integration.annotation.Publisher;
+import org.springframework.integration.core.MessagingTemplate;
+import org.springframework.integration.support.MessageBuilder;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.TransactionException;
@@ -38,13 +41,21 @@ public final class TweetController {
     private final TweetRepository tweetRepository;
 
     /**
+     * Spring Integration messaging system.
+     */
+    private final MessagingTemplate messagingTemplate;
+
+    /**
      * Only Class Constructor.
      *
      * @param tr TweetRepository implementation.
+     * @param mt Spring Integration messaging system.
      */
     @Inject
-    public TweetController(final TweetRepository tr) {
+    public TweetController(final TweetRepository tr,
+                           final MessagingTemplate mt) {
         this.tweetRepository = tr;
+        this.messagingTemplate = mt;
     }
 
     /**
@@ -54,18 +65,15 @@ public final class TweetController {
      * @return a new Tweet with the desired text.
      */
     @Secured({ "ROLE_USER" })
-    @Publisher(channel = "newTweetNotificationChannel")
     @RequestMapping(value = "/t/new", method = RequestMethod.POST)
     @ResponseBody
     public Tweet newTweet(@Principal final User user,
                           @RequestParam(value = "tweet") final String tweet) {
         String language = LocaleContextHolder.getLocale().getLanguage();
-        return this.tweetRepository.newTweet(user, tweet, language);
-        /*
+        Tweet newTweet = this.tweetRepository.newTweet(user, tweet, language);
         Message<Tweet> message = MessageBuilder.withPayload(newTweet).build();
         this.messagingTemplate.send("newTweetNotificationChannel", message);
         return newTweet;
-        */
     }
 
     @ExceptionHandler(PersistenceException.class)

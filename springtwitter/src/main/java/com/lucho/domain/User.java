@@ -42,7 +42,6 @@ public class User implements UserDetails {
 
     @Id
     @GeneratedValue
-    @JsonIgnore
     private Integer id;
 
     @NotEmpty
@@ -83,7 +82,6 @@ public class User implements UserDetails {
         this.password = pass;
     }
 
-    @JsonIgnore
     public final Integer getId() {
         return id;
     }

@@ -3,3 +3,4 @@
  * Implements Spring Data JPA approach.
  * @author Luciano.Leggieri
  */
+package com.lucho.repository;
