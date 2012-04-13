@@ -7,14 +7,15 @@
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
-
+    <!--
     <logger name="org.springframework" level="info" />
 
     <logger name="org.hibernate" level="info" />
 
     <logger name="com.lucho" level="debug" />
+    -->
 
-    <root level="info">
+    <root level="debug">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>

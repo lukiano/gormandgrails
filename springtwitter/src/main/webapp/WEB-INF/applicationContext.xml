@@ -15,6 +15,7 @@
     <context:load-time-weaver aspectj-weaving="on"/>
     <context:spring-configured />
     <context:annotation-config />
+    <context:property-placeholder location="classpath:application.properties" />
 
     <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
 

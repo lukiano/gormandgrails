@@ -20,12 +20,7 @@
 		
 	<bean id="cacheManagerJNDI" class="com.lucho.util.JNDIExporter" depends-on="cacheManager">
         <constructor-arg index="0" ref="infinispanCacheManager" />
-        <constructor-arg index="1" value="CacheManager" />
+        <constructor-arg index="1" value="cacheManager" />
 	</bean>
 
-	<bean id="dataSourceJNDI" class="com.lucho.util.JNDIExporter" depends-on="dataSource">
-        <constructor-arg index="0" ref="dataSource" />
-        <constructor-arg index="1" value="DataSource" />
-	</bean>
-	
 </beans>
