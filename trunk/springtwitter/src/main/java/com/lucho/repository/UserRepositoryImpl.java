@@ -17,7 +17,7 @@ public class UserRepositoryImpl extends QueryDslRepositorySupport implements Use
             this.getEntityManager().persist(user);
             List<User> followedBy = user.getFollowedBy();
             if (followedBy == null) {
-                followedBy = new ArrayList<>();
+                followedBy = new ArrayList<User>();
                 followedBy.add(user);
                 user.setFollowedBy(followedBy);
             } else {

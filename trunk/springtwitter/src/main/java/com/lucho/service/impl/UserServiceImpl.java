@@ -4,6 +4,8 @@ import com.lucho.domain.User;
 import com.lucho.repository.UserRepository;
 import com.lucho.service.UserService;
 import org.infinispan.api.BasicCacheContainer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,6 +23,7 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  * {@link UserService} default implementation.
+ *
  * @author Luciano.Leggieri
  */
 @Service("userService")
@@ -45,9 +48,16 @@ public final class UserServiceImpl implements UserDetailsService, UserService {
     public static final String CACHE_NAME = "refresher";
 
     /**
+     * Logger.
+     */
+    private static final Logger LOG =
+            LoggerFactory.getLogger(UserService.class);
+
+    /**
      * Class constructor.
+     *
      * @param anUserRepository injects user repository implementation.
-     * @param ecm injects container used to get the Cache Map.
+     * @param ecm              injects container used to get the Cache Map.
      */
     @Inject
     public UserServiceImpl(final UserRepository anUserRepository,
@@ -72,15 +82,22 @@ public final class UserServiceImpl implements UserDetailsService, UserService {
     @Override
     public void refreshFollowersFor(final Integer ownerId) {
         User user = this.userRepository.findOne(ownerId);
-        List<User> followedByList = user.getFollowedBy();
-        for (User follower : followedByList) {
+        LOG.info("Refreshing followers for user " + user.getUsername());
+        for (User follower : user.getFollowedBy()) {
             usersToBeRefreshed.put(follower.getId(), Boolean.TRUE);
         }
     }
 
     @Override
     public boolean shouldRefresh(final User user) {
-        return usersToBeRefreshed.remove(user.getId()) != null;
+        boolean shouldRefresh = usersToBeRefreshed.remove(user.getId()) != null;
+        String username = user.getUsername();
+        if (shouldRefresh) {
+            LOG.debug("User " + username + " should be refreshed.");
+        } else {
+            LOG.debug("User " + username + " should NOT be refreshed.");
+        }
+        return shouldRefresh;
     }
 
 }

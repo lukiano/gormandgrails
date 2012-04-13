@@ -50,7 +50,7 @@ public final class UserController {
      * @param user         the logged in user.
      * @param userToFollow the user to follow.
      */
-    @RequestMapping(value = "/t/follow", method = RequestMethod.POST)
+    @RequestMapping(value = "/t/follow", method = RequestMethod.GET)
     public void followUser(@Principal final User user,
                            @RequestParam(value = "id")
                            final User userToFollow) {

@@ -6,3 +6,4 @@
  * Tweet: A limited message an user writes and show in his wall
  * and the walls of the users that follow him.
  */
+package com.lucho.domain;
