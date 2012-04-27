@@ -13,7 +13,26 @@
     <util:properties id="jdbcConfiguration" location="classpath:jdbcdatasource.properties"/>
     <util:properties id="hibernateProperties" location="classpath:hibernate.properties"/>
 
-    <bean id="dataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" init-method="init" destroy-method="close" depends-on="transactionManager">
+    <bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
+        <property name="driverClass" value="${datasource.driver}" />
+        <property name="jdbcUrl" value="${datasource.url}"/>
+        <property name="username" value="#{jdbcConfiguration.getProperty('user')}"/>
+        <property name="password" value="#{jdbcConfiguration.getProperty('password')}"/>
+        <property name="maxConnectionsPerPartition" value="30"/>
+        <property name="minConnectionsPerPartition" value="10"/>
+        <property name="partitionCount" value="3"/>
+        <property name="acquireIncrement" value="5"/>
+        <property name="statementsCacheSize" value="100"/>
+        <property name="releaseHelperThreads" value="3"/>
+    </bean>
+
+    <bean id="dataSourceJNDI" class="com.lucho.util.JNDIExporter" depends-on="dataSource">
+        <constructor-arg index="0" ref="dataSource" />
+        <constructor-arg index="1" value="dataSource" />
+    </bean>
+
+    <!--
+    <bean id="xaDataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" init-method="init" destroy-method="close" depends-on="transactionManager">
     	<property name="className" value="${datasource.classname}" />
     	<property name="uniqueName" value="XADBMS" />
         <property name="maxPoolSize" value="50"/>
@@ -22,16 +41,24 @@
     	<property name="ignoreRecoveryFailures" value="true" />
     	<property name="allowLocalTransactions" value="true" />
 	</bean>
+	-->
 
-    <bean id="dataSourceJNDI" class="com.lucho.util.JNDIExporter" depends-on="dataSource">
-        <constructor-arg index="0" ref="dataSource" />
-        <constructor-arg index="1" value="dataSource" />
+    <!-- configure an Atomikos JTA-aware datasource -->
+    <bean id="xaDataSource"
+          class="com.atomikos.jdbc.AtomikosDataSourceBean"
+          init-method="init" destroy-method="close" depends-on="transactionManager">
+        <property name="uniqueResourceName" value="XADBMS" />
+        <property name="maxPoolSize" value="50"/>
+        <property name="minPoolSize" value="5"/>
+        <property name="xaDataSourceClassName" value="${datasource.classname}"/>
+        <property name="xaProperties" ref="jdbcConfiguration" />
+        <property name="poolSize" value="3"/>
     </bean>
 
     <bean id="sessionFactory"
-          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" depends-on="cacheManagerJNDI">
+          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" depends-on="cacheManagerJNDI, connectionFactoryJNDI">
 
-        <property name="dataSource" ref="dataSource" />
+        <property name="dataSource" ref="xaDataSource" />
         <property name="jpaVendorAdapter">
         	<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
         </property>
@@ -49,5 +76,8 @@
             <bean class="com.lucho.util.JtaPersistenceUnitPostProcessor" />
         </property>
     </bean>
+
+    <bean class="com.lucho.domain.Tweet" scope="prototype" />
+    <bean class="com.lucho.domain.User" scope="prototype" />
 
 </beans>

@@ -1,18 +1,18 @@
 package com.lucho.controller;
 
-import com.lucho.domain.Tweet;
-import com.lucho.domain.User;
-import com.lucho.repository.TweetRepository;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.persistence.PersistenceException;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
-import org.springframework.integration.Message;
-import org.springframework.integration.annotation.Publisher;
-import org.springframework.integration.core.MessagingTemplate;
-import org.springframework.integration.support.MessageBuilder;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.TransactionException;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,18 +20,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import javax.inject.Inject;
-import javax.persistence.PersistenceException;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import java.util.List;
+import com.lucho.domain.Tweet;
+import com.lucho.domain.User;
+import com.lucho.repository.TweetRepository;
 
 /**
  * MVC Controller for Tweet operations.
  *
  * @author Luciano.Leggieri
  */
-@Transactional
 @Controller
 public final class TweetController {
 
@@ -41,39 +38,30 @@ public final class TweetController {
     private final TweetRepository tweetRepository;
 
     /**
-     * Spring Integration messaging system.
-     */
-    private final MessagingTemplate messagingTemplate;
-
-    /**
      * Only Class Constructor.
      *
      * @param tr TweetRepository implementation.
-     * @param mt Spring Integration messaging system.
      */
     @Inject
-    public TweetController(final TweetRepository tr,
-                           final MessagingTemplate mt) {
+    public TweetController(final TweetRepository tr) {
         this.tweetRepository = tr;
-        this.messagingTemplate = mt;
     }
 
     /**
      * Creates a new tweet.
      * @param user logged in User.
-     * @param tweet the text that will go in the new tweet.
+     * @param text the text that will go in the new tweet.
      * @return a new Tweet with the desired text.
      */
     @Secured({ "ROLE_USER" })
     @RequestMapping(value = "/t/new", method = RequestMethod.POST)
     @ResponseBody
     public Tweet newTweet(@Principal final User user,
-                          @RequestParam(value = "tweet") final String tweet) {
+                          @RequestParam(value = "tweet") final String text) {
         String language = LocaleContextHolder.getLocale().getLanguage();
-        Tweet newTweet = this.tweetRepository.newTweet(user, tweet, language);
-        Message<Tweet> message = MessageBuilder.withPayload(newTweet).build();
-        this.messagingTemplate.send("newTweetNotificationChannel", message);
-        return newTweet;
+        Tweet tweet = new Tweet(user, text, language);
+        tweet.save();
+        return tweet;
     }
 
     @ExceptionHandler(PersistenceException.class)
@@ -92,6 +80,13 @@ public final class TweetController {
             returnMessage = pe.getLocalizedMessage();
         }
         return returnMessage;
+    }
+
+    @ExceptionHandler(DataAccessException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleDataAccessException(final DataAccessException de) {
+        return de.getLocalizedMessage();
     }
 
     @ExceptionHandler(TransactionException.class)
@@ -135,15 +130,31 @@ public final class TweetController {
     /**
      * Gets the User's tweet line.
      * @param user logged in User.
+     * @param millis number of milliseconds that represent a Date.
+     *               The method will return only tweets greater than this date,
+     *               unless the value is null.
      * @return a lists with the User's tweets and those
      * of the ones it follows.
      */
     @Secured({ "ROLE_USER" })
     @RequestMapping(value = "/t/get", method = RequestMethod.GET)
     @ResponseBody
-    public List<Tweet> getTweets(@Principal final User user) {
-        return this.tweetRepository.getTweetsForUserIncludingFollows(user);
+    public List<Tweet> getTweets(@Principal final User user,
+                                 @RequestParam(value = "from", required = false)
+                                 final Long millis) {
+        return user.getTweetsIncludingFollows(millis);
 
+    }
+    
+    /**
+     * Re indexes Tweets.
+     * @return true when re indexing completes.
+     */
+    @RequestMapping(value = "/reindex", method = RequestMethod.GET)
+    @ResponseBody
+    public Boolean reindex() {
+    	this.tweetRepository.reindex();
+    	return true;
     }
 
 }

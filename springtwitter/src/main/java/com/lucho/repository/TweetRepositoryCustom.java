@@ -2,7 +2,6 @@ package com.lucho.repository;
 
 import com.lucho.domain.Tweet;
 import com.lucho.domain.User;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -11,21 +10,19 @@ import java.util.List;
  *
  * @author Luciano.Leggieri
  */
-@Transactional
 public interface TweetRepositoryCustom {
 
     /**
      *
      * @param user
+     * @param millis
      * @return
      */
-    @Transactional(readOnly = true)
-    List<Tweet> getTweetsForUserIncludingFollows(User user);
+    List<Tweet> getTweetsForUserIncludingFollows(User user, Long millis);
 
-    @Transactional
-    Tweet newTweet(User user, String text, String language);
-
-    @Transactional(readOnly = true)
     List<Tweet> searchTweets(String textToSearch);
 
+    void saveAndLetOthersKnow(final Tweet tweet);
+    
+    void reindex();
 }

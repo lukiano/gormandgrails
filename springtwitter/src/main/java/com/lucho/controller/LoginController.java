@@ -4,10 +4,11 @@ import com.lucho.domain.User;
 import com.lucho.repository.UserRepository;
 import org.springframework.context.MessageSource;
 import org.springframework.context.support.MessageSourceAccessor;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.TransactionException;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -16,9 +17,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.inject.Inject;
+import javax.persistence.EntityExistsException;
 import javax.persistence.PersistenceException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
@@ -27,7 +27,6 @@ import javax.validation.ConstraintViolationException;
  *
  * @author Luciano.Leggieri
  */
-@Transactional
 @Controller
 public final class LoginController {
 
@@ -68,6 +67,22 @@ public final class LoginController {
         } else {
             returnMessage = pe.getLocalizedMessage();
         }
+        if (pe instanceof EntityExistsException) {
+            returnMessage = messages.getMessage("login.register.failure");
+        }
+        return returnMessage;
+    }
+
+    @ExceptionHandler(DataAccessException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleDataAccessException(final DataAccessException de) {
+        String returnMessage;
+        if (de instanceof DataIntegrityViolationException) {
+            returnMessage = messages.getMessage("login.register.failure");
+        } else {
+            returnMessage = de.getLocalizedMessage();
+        }
         return returnMessage;
     }
 
@@ -98,14 +113,9 @@ public final class LoginController {
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     @ResponseBody
     public String register(final String username, final String password) {
-        String returnMessage;
-        User newUser = this.userRepository.addUser(username, password);
-        if (newUser == null) {
-            returnMessage = messages.getMessage("login.register.failure");
-        } else {
-            returnMessage = messages.getMessage("login.register.success");
-        }
-        return returnMessage;
+        User newUser = new User(username, password);
+        newUser.save();
+        return  messages.getMessage("login.register.success");
     }
 
     /**
@@ -118,10 +128,10 @@ public final class LoginController {
     @ResponseBody
     public String exists(@RequestParam(value = "name") final String username) {
         String message;
-        if (this.userRepository.userExists(username)) {
-            message = messages.getMessage("login.username.exists");
-        } else {
+        if (this.userRepository.findByUsername(username) == null) {
             message = messages.getMessage("login.username.free");
+        } else {
+            message = messages.getMessage("login.username.exists");
         }
         return message;
     }

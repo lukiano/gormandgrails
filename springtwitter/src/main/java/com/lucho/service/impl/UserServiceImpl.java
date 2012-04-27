@@ -82,7 +82,7 @@ public final class UserServiceImpl implements UserDetailsService, UserService {
     @Override
     public void refreshFollowersFor(final Integer ownerId) {
         User user = this.userRepository.findOne(ownerId);
-        LOG.info("Refreshing followers for user " + user.getUsername());
+        LOG.info("Refreshing followers for user " + user);
         for (User follower : user.getFollowedBy()) {
             usersToBeRefreshed.put(follower.getId(), Boolean.TRUE);
         }
@@ -91,11 +91,10 @@ public final class UserServiceImpl implements UserDetailsService, UserService {
     @Override
     public boolean shouldRefresh(final User user) {
         boolean shouldRefresh = usersToBeRefreshed.remove(user.getId()) != null;
-        String username = user.getUsername();
         if (shouldRefresh) {
-            LOG.debug("User " + username + " should be refreshed.");
+            LOG.debug("User " + user + " should be refreshed.");
         } else {
-            LOG.debug("User " + username + " should NOT be refreshed.");
+            LOG.debug("User " + user + " should NOT be refreshed.");
         }
         return shouldRefresh;
     }

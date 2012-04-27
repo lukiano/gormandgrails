@@ -62,8 +62,8 @@
                  lockAcquisitionTimeout="15000" useLockStriping="false" />
         <!-- Eviction configuration.  WakeupInterval defines how often the eviction thread runs, in milliseconds.
                    0 means the eviction thread will never run.  A separate executor is used for eviction in each cache. -->
-        <transaction transactionMode="TRANSACTIONAL" autoCommit="false"
-                     lockingMode="OPTIMISTIC" transactionManagerLookupClass="com.lucho.util.BitronixTransactionManagerLookup"/>
+        <transaction useSynchronization="true" transactionMode="TRANSACTIONAL" autoCommit="false"
+                     lockingMode="OPTIMISTIC" transactionManagerLookupClass="com.lucho.util.AtomikosTransactionManagerLookup"/>
         <eviction wakeUpInterval="5000" maxEntries="10000" strategy="LRU"/>
         <expiration maxIdle="100000"/>
         <lazyDeserialization enabled="true"/>
@@ -81,7 +81,7 @@
                 repeatable-read semantic. Before choosing this config, carefully read the docs
                 and make sure you really need REPEATABLE_READ.
                -->
-        <transaction transactionMode="TRANSACTIONAL" autoCommit="false"
+        <transaction useSynchronization="true" transactionMode="TRANSACTIONAL" autoCommit="false"
                      lockingMode="OPTIMISTIC" transactionManagerLookupClass="com.lucho.util.BitronixTransactionManagerLookup"/>
         <locking isolationLevel="REPEATABLE_READ" concurrencyLevel="1000"
                  lockAcquisitionTimeout="15000" useLockStriping="false"/>
@@ -98,8 +98,8 @@
             <stateRetrieval fetchInMemoryState="false" timeout="20000"/>
             <sync replTimeout="20000"/>
         </clustering>
-        <transaction transactionMode="TRANSACTIONAL" autoCommit="false"
-                     lockingMode="OPTIMISTIC" transactionManagerLookupClass="com.lucho.util.BitronixTransactionManagerLookup"/>
+        <transaction useSynchronization="true" transactionMode="TRANSACTIONAL" autoCommit="false"
+                     lockingMode="OPTIMISTIC" transactionManagerLookupClass="com.lucho.util.AtomikosTransactionManagerLookup"/>
         <locking isolationLevel="READ_COMMITTED" concurrencyLevel="1000"
                  lockAcquisitionTimeout="15000" useLockStriping="false"/>
         <!-- Eviction configuration.  WakeupInterval defines how often the eviction thread runs, in milliseconds.
@@ -113,7 +113,7 @@
     <!-- A config appropriate for query caching. Does not replicate queries. -->
     <namedCache name="local-query">
         <transaction transactionMode="TRANSACTIONAL" autoCommit="false"
-                     lockingMode="OPTIMISTIC" transactionManagerLookupClass="com.lucho.util.BitronixTransactionManagerLookup"/>
+                     lockingMode="OPTIMISTIC" transactionManagerLookupClass="com.lucho.util.AtomikosTransactionManagerLookup"/>
         <locking isolationLevel="READ_COMMITTED" concurrencyLevel="1000"
                  lockAcquisitionTimeout="15000" useLockStriping="false"/>
         <!--Eviction configuration.  WakeupInterval defines how often the eviction thread runs, in milliseconds.  0 means
@@ -127,8 +127,8 @@
         <clustering mode="replication">
             <async/>
         </clustering>
-        <transaction transactionMode="TRANSACTIONAL" autoCommit="false"
-                     lockingMode="OPTIMISTIC" transactionManagerLookupClass="com.lucho.util.BitronixTransactionManagerLookup" />
+        <transaction useSynchronization="true" transactionMode="TRANSACTIONAL" autoCommit="false"
+                     lockingMode="OPTIMISTIC" transactionManagerLookupClass="com.lucho.util.AtomikosTransactionManagerLookup" />
         <locking isolationLevel="READ_COMMITTED" concurrencyLevel="1000"
                  lockAcquisitionTimeout="15000" useLockStriping="false"/>
         <!--Eviction configuration.  WakeupInterval defines how often the eviction thread runs, in milliseconds.  0 means
@@ -154,8 +154,8 @@
         <clustering mode="replication">
             <async/>
         </clustering>
-        <transaction transactionMode="TRANSACTIONAL" autoCommit="false"
-                     lockingMode="OPTIMISTIC" transactionManagerLookupClass="com.lucho.util.BitronixTransactionManagerLookup" />
+        <transaction useSynchronization="true" transactionMode="TRANSACTIONAL" autoCommit="false"
+                     lockingMode="OPTIMISTIC" transactionManagerLookupClass="com.lucho.util.AtomikosTransactionManagerLookup" />
         <locking isolationLevel="READ_COMMITTED" concurrencyLevel="1000"
                  lockAcquisitionTimeout="15000" useLockStriping="false"/>
         <lazyDeserialization enabled="true"/>
@@ -177,8 +177,8 @@
         <clustering mode="replication">
             <async/>
         </clustering>
-        <transaction transactionMode="TRANSACTIONAL" autoCommit="false"
-                     lockingMode="OPTIMISTIC" transactionManagerLookupClass="com.lucho.util.BitronixTransactionManagerLookup" />
+        <transaction useSynchronization="true" transactionMode="TRANSACTIONAL" autoCommit="false"
+                     lockingMode="OPTIMISTIC" transactionManagerLookupClass="com.lucho.util.AtomikosTransactionManagerLookup" />
         <locking isolationLevel="REPEATABLE_READ" concurrencyLevel="1000"
                  lockAcquisitionTimeout="15000" useLockStriping="false"/>
         <lazyDeserialization enabled="true"/>
@@ -206,7 +206,7 @@
 			<sync replTimeout="25000" />
 		</clustering>
 		<transaction useSynchronization="true" transactionMode="TRANSACTIONAL"
-			transactionManagerLookupClass="com.lucho.util.BitronixTransactionManagerLookup">
+			transactionManagerLookupClass="com.lucho.util.AtomikosTransactionManagerLookup">
 			<recovery enabled="false" />
 		</transaction>
         <locking isolationLevel="REPEATABLE_READ" lockAcquisitionTimeout="20000" writeSkewCheck="false"
@@ -215,6 +215,7 @@
         <invocationBatching enabled="true" />
         <eviction maxEntries="-1" strategy="NONE" />
         <expiration maxIdle="-1" />
+        <!-- 
         <loaders>
 			<loader
 				class="org.infinispan.loaders.jdbc.stringbased.JdbcStringBasedCacheStore"
@@ -228,24 +229,10 @@
 					<property name="timestampColumnName" value="TIMESTAMP_COLUMN" />
 					<property name="timestampColumnType" value="bigint" />
 
-                    <!--
 					<property name="connectionFactoryClass"
 						value="org.infinispan.loaders.jdbc.connectionfactory.ManagedConnectionFactory" />
 					<property name="datasourceJndiLocation"
 						value="comp/dataSource" />
-					-->
-                    <property name="connectionFactoryClass"
-                              value="org.infinispan.loaders.jdbc.connectionfactory.PooledConnectionFactory"/>
-                    <!--
-                    <property name="connectionUrl" value="jdbc:h2:nioMapped:/Users/luciano/workspace3/springtwitter/h2data"/>
-                    <property name="driverClass" value="org.h2.Driver"/>
-                    -->
-
-                    <property name="connectionUrl" value="jdbc:postgresql://localhost/java"/>
-                    <property name="driverClass" value="org.postgresql.Driver"/>
-                    <property name="userName" value="javajava" />
-                    <property name="password" value="javajava" />
-
 
                     <property name="idColumnType" value="varchar(255)" />
 					<property name="dataColumnType" value="bytea" />
@@ -254,6 +241,7 @@
 				</properties>
 			</loader>
 		</loaders>
+		 -->
 	</namedCache>
 
 	<!-- **************************** -->
@@ -268,13 +256,14 @@
         <locking isolationLevel="REPEATABLE_READ" lockAcquisitionTimeout="20000" writeSkewCheck="false"
                  concurrencyLevel="500" useLockStriping="false" />
         <transaction useSynchronization="true" transactionMode="TRANSACTIONAL"
-			transactionManagerLookupClass="com.lucho.util.BitronixTransactionManagerLookup">
+			transactionManagerLookupClass="com.lucho.util.AtomikosTransactionManagerLookup">
 			<recovery enabled="false" />
 		</transaction>
         <!-- Invocation batching is required for use with the Lucene Directory -->
         <invocationBatching enabled="true" />
         <eviction maxEntries="-1" strategy="NONE" />
         <expiration maxIdle="-1" />
+        <!-- 
         <loaders>
 			<loader
 				class="org.infinispan.loaders.jdbc.stringbased.JdbcStringBasedCacheStore"
@@ -288,24 +277,10 @@
 					<property name="timestampColumnName" value="TIMESTAMP_COLUMN" />
 					<property name="timestampColumnType" value="bigint" />
 
-                    <!--
 					<property name="connectionFactoryClass"
 						value="org.infinispan.loaders.jdbc.connectionfactory.ManagedConnectionFactory" />
 					<property name="datasourceJndiLocation"
 						value="comp/dataSource" />
-					-->
-                    <property name="connectionFactoryClass"
-                              value="org.infinispan.loaders.jdbc.connectionfactory.PooledConnectionFactory"/>
-
-                    <!--
-                    <property name="connectionUrl" value="jdbc:h2:nioMapped:/Users/luciano/workspace3/springtwitter/h2data"/>
-                    <property name="driverClass" value="org.h2.Driver"/>
-                    -->
-
-                    <property name="connectionUrl" value="jdbc:postgresql://localhost/java"/>
-                    <property name="driverClass" value="org.postgresql.Driver"/>
-                    <property name="userName" value="javajava" />
-                    <property name="password" value="javajava" />
 
                     <property name="idColumnType" value="varchar(255)" />
 					<property name="dataColumnType" value="bytea" />
@@ -314,6 +289,7 @@
 				</properties>
 			</loader>
 		</loaders>
+		 -->
 	</namedCache>
 
 	<!-- ***************************** -->
@@ -332,9 +308,10 @@
         <eviction maxEntries="-1" strategy="NONE" />
         <expiration maxIdle="-1" />
         <transaction useSynchronization="true" transactionMode="TRANSACTIONAL"
-			transactionManagerLookupClass="com.lucho.util.BitronixTransactionManagerLookup">
+			transactionManagerLookupClass="com.lucho.util.AtomikosTransactionManagerLookup">
 			<recovery enabled="false" />
 		</transaction>
+		<!-- 
         <loaders>
             <loader
                     class="org.infinispan.loaders.jdbc.stringbased.JdbcStringBasedCacheStore"
@@ -348,25 +325,10 @@
                     <property name="timestampColumnName" value="TIMESTAMP_COLUMN" />
                     <property name="timestampColumnType" value="bigint" />
 
-                    <!--
 					<property name="connectionFactoryClass"
 						value="org.infinispan.loaders.jdbc.connectionfactory.ManagedConnectionFactory" />
 					<property name="datasourceJndiLocation"
 						value="comp/dataSource" />
-					-->
-                    <property name="connectionFactoryClass"
-                              value="org.infinispan.loaders.jdbc.connectionfactory.PooledConnectionFactory"/>
-
-                    <!--
-                    <property name="connectionUrl" value="jdbc:h2:nioMapped:/Users/luciano/workspace3/springtwitter/h2data"/>
-                    <property name="driverClass" value="org.h2.Driver"/>
-                    -->
-
-                    <property name="connectionUrl" value="jdbc:postgresql://localhost/java"/>
-                    <property name="driverClass" value="org.postgresql.Driver"/>
-
-                    <property name="userName" value="javajava" />
-                    <property name="password" value="javajava" />
 
                     <property name="idColumnType" value="varchar(255)" />
                     <property name="dataColumnType" value="bytea" />
@@ -375,6 +337,7 @@
                 </properties>
             </loader>
         </loaders>
+        -->
 	</namedCache>
 
 </infinispan>

@@ -4,70 +4,118 @@ import com.lucho.domain.QTweet;
 import com.lucho.domain.QUser;
 import com.lucho.domain.Tweet;
 import com.lucho.domain.User;
-import com.mysema.query.types.OrderSpecifier;
+import com.mysema.query.types.expr.BooleanExpression;
+import org.apache.lucene.search.Query;
 import org.hibernate.search.jpa.FullTextEntityManager;
+import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.jpa.Search;
+import org.hibernate.search.query.DatabaseRetrievalMethod;
+import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.joda.time.DateTime;
 import org.springframework.data.jpa.repository.support.QueryDslRepositorySupport;
+import org.springframework.integration.Message;
+import org.springframework.integration.core.MessagingTemplate;
+import org.springframework.integration.support.MessageBuilder;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.Query;
+import javax.inject.Inject;
 import java.util.List;
 
 /**
  * Default {@link TweetRepository} implementation.
+ *
  * @author Luciano.Leggieri
  */
+@Transactional(readOnly = true)
 public class TweetRepositoryImpl extends QueryDslRepositorySupport
         implements TweetRepositoryCustom {
 
+    /**
+     * Maximum number of tweets to return in a search.
+     */
     private static final int MAX_RESULTS = 20;
+
+
+    /**
+     * Spring Integration messaging system.
+     */
+    @Inject
+    private MessagingTemplate messagingTemplate;
+
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public final List<Tweet> getTweetsForUserIncludingFollows(final User user) {
+    public final List<Tweet> getTweetsForUserIncludingFollows(
+            final User user, final Long millis) {
         QTweet qtweet = QTweet.tweet1;
         QUser followedBy = new QUser("followedBy");
+        BooleanExpression whereClause = followedBy.id.eq(user.getId());
+        if (millis != null) {
+            DateTime dateTime = new DateTime(millis.longValue());
+            whereClause = whereClause.and(qtweet.creationDate.after(dateTime));
+        }
         return this.from(qtweet).join(qtweet.owner.followedBy, followedBy)
-                .where(followedBy.id.eq(user.getId()))
+                .where(whereClause)
                 .orderBy(qtweet.creationDate.desc())
                 .limit(MAX_RESULTS)
                 .list(qtweet);
     }
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public final Tweet newTweet(final User user, final String text,
-                          final String language) {
-        Tweet tweet = new Tweet(user, text, language);
-        this.getEntityManager().persist(tweet);
-        return tweet;
+    public final void reindex() {
+        FullTextEntityManager fullTextEntityManager =
+                Search.getFullTextEntityManager(this.getEntityManager());
+        for (Tweet tweet : this.from(QTweet.tweet1).list(QTweet.tweet1)) {
+        	fullTextEntityManager.index(tweet);
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<Tweet> searchTweets(final String textToSearch) {
+    public final List<Tweet> searchTweets(final String textToSearch) {
         FullTextEntityManager fullTextEntityManager =
                 Search.getFullTextEntityManager(this.getEntityManager());
 
         // create native Lucene query using the query DSL
-        // alternatively you can write the Lucene query using the Lucene query parser
-        // or the Lucene programmatic API. The Hibernate Search DSL is recommended though
+        // alternatively you can write the
+        // Lucene query using the Lucene query parser
+        // or the Lucene programmatic API.
+        // The Hibernate Search DSL is recommended though.
         QueryBuilder qb = fullTextEntityManager.getSearchFactory()
                 .buildQueryBuilder().forEntity(Tweet.class).get();
-        org.apache.lucene.search.Query lQuery = qb.keyword()
-                .onFields("tweet").matching(textToSearch).createQuery();
+        Query lQuery = qb.keyword()
+                .onField("tweet").matching(textToSearch).createQuery();
 
         // wrap Lucene query in a org.hibernate.Query
-        Query query = fullTextEntityManager.createFullTextQuery(lQuery, Tweet.class);
+        FullTextQuery query =
+                fullTextEntityManager.createFullTextQuery(lQuery, Tweet.class);
+        query.initializeObjectsWith(
+                //first looks in 2nd level cache, we take advantage of it.
+                ObjectLookupMethod.SECOND_LEVEL_CACHE,
+                DatabaseRetrievalMethod.QUERY
+        );
         query.setMaxResults(MAX_RESULTS);
         return query.getResultList();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Transactional
+    @Override
+    public final void saveAndLetOthersKnow(final Tweet tweet) {
+        this.getEntityManager().persist(tweet);
+        Message<Tweet> message = MessageBuilder.withPayload(tweet).build();
+        this.messagingTemplate.send(message);
+    }
+
 
 }

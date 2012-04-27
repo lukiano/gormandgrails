@@ -9,52 +9,53 @@
 
 	<tx:annotation-driven mode="aspectj" />
 
-	<!-- Construct Atomikos UserTransactionManager, needed to configure Spring
+	<!-- Construct Atomikos UserTransactionManager, needed to configure Spring -->
 	<bean id="atomikosTransactionManager" class="com.atomikos.icatch.jta.UserTransactionManager"
-		init-method="init" destroy-method="close" depends-on="datasource">
+		init-method="init" destroy-method="close">
 
 		<property name="forceShutdown" value="false" />
 	</bean>
-	 -->
 
-	<!-- Also use Atomikos UserTransactionImp, needed to configure Spring
-	<bean id="atomikosUserTransaction" class="com.atomikos.icatch.jta.J2eeUserTransaction"
-		depends-on="datasource">
+
+	<!-- Also use Atomikos UserTransactionImp, needed to configure Spring -->
+	<bean id="atomikosUserTransaction" class="com.atomikos.icatch.jta.J2eeUserTransaction">
 
 		<property name="transactionTimeout" value="300" />
 	</bean>
-	 -->
 
-	<!-- Configure the Spring framework to use JTA transactions from Atomikos
+	<!-- Configure the Spring framework to use JTA transactions from Atomikos -->
 	<bean id="transactionManager"
 		class="org.springframework.transaction.jta.JtaTransactionManager">
 		<property name="transactionManager" ref="atomikosTransactionManager" />
 		<property name="userTransaction" ref="atomikosUserTransaction" />
 		<property name="allowCustomIsolationLevels" value="true" />
 	</bean>
- 	-->
+
+
     <!--
     <bean id="bitronixInfinispanLoader"
           class="bitronix.tm.resource.infinispan.BitronixInfinispanLoader" />
      -->
 
-	<!-- Bitronix Transaction Manager embedded configuration -->
+	<!-- Bitronix Transaction Manager embedded configuration
 	<bean id="btmConfig" factory-method="getConfiguration"
 		class="bitronix.tm.TransactionManagerServices" >
 		<property name="serverId" value="spring-btm" />
 	</bean>
+    -->
 
-	<!-- create BTM transaction manager -->
-	<bean id="bitronixTransactionManager" factory-method="getTransactionManager"
-		class="bitronix.tm.TransactionManagerServices" depends-on="btmConfig"
+	<!-- create BTM transaction manager
+	<bean id="bitronixTransactionManager"
+		class="com.lucho.util.BitronixTransactionManager" depends-on="btmConfig"
 		destroy-method="shutdown" />
+     -->
 
-	<!-- Configure the Spring framework to use JTA transactions from Bitronix -->
+	<!-- Configure the Spring framework to use JTA transactions from Bitronix
 	<bean id="transactionManager"
 		class="org.springframework.transaction.jta.JtaTransactionManager">
 		<property name="transactionManager" ref="bitronixTransactionManager" />
 		<property name="userTransaction" ref="bitronixTransactionManager" />
 		<property name="allowCustomIsolationLevels" value="true" />
 	</bean>
-
+	-->
 </beans>
