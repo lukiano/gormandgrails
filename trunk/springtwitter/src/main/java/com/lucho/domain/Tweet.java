@@ -1,5 +1,6 @@
 package com.lucho.domain;
 
+import com.lucho.repository.TweetRepository;
 import com.lucho.util.LanguageDiscriminator;
 import org.apache.solr.analysis.ASCIIFoldingFilterFactory;
 import org.apache.solr.analysis.LowerCaseFilterFactory;
@@ -7,6 +8,7 @@ import org.apache.solr.analysis.SnowballPorterFilterFactory;
 import org.apache.solr.analysis.StandardFilterFactory;
 import org.apache.solr.analysis.StandardTokenizerFactory;
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Type;
@@ -25,13 +27,16 @@ import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Configurable;
 
+import javax.inject.Inject;
 import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
@@ -81,7 +86,18 @@ import javax.validation.constraints.Size;
                                 })
                 })
 })
+@Configurable
 public class Tweet {
+
+
+    /**
+     * TweetRepository implementation.
+     */
+    @Inject
+    @Transient
+    @JsonIgnore
+    private TweetRepository tweetRepository;
+
 
     /**
      * Maximum length for a tweet text.
@@ -104,6 +120,7 @@ public class Tweet {
     @Size(max = MAX_TWEET_LENGTH)
     @Field(index = Index.YES, store = Store.COMPRESS,
             termVector = TermVector.WITH_POSITION_OFFSETS)
+    @JsonProperty
     private String tweet;
 
     /**
@@ -118,18 +135,19 @@ public class Tweet {
      */
     @NotNull
     @ManyToOne
+    @JsonProperty
     private User owner;
 
     @NotNull
     @Past
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    @JsonProperty
     private DateTime creationDate;
 
     /**
      * Default Class Constructor.
      */
     protected Tweet() {
-
     }
 
     /**
@@ -145,44 +163,8 @@ public class Tweet {
         this.creationDate = new DateTime();
     }
 
-    public DateTime getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(final DateTime theCreationDate) {
-        this.creationDate = theCreationDate;
-    }
-
-    public final Integer getId() {
-        return id;
-    }
-
-    public final void setId(final Integer anId) {
-        this.id = anId;
-    }
-
-    public final String getTweet() {
-        return tweet;
-    }
-
-    public final void setTweet(final String aTweet) {
-        this.tweet = aTweet;
-    }
-
     public final User getOwner() {
         return owner;
-    }
-
-    public final void setOwner(final User newOwner) {
-        this.owner = newOwner;
-    }
-
-    public final String getLanguage() {
-        return language;
-    }
-
-    public final void setLanguage(final String newLanguage) {
-        this.language = newLanguage;
     }
 
     @Override
@@ -195,6 +177,11 @@ public class Tweet {
     @Override
     public final int hashCode() {
         return this.id;
+    }
+
+    @JsonIgnore
+    public void save() {
+        this.tweetRepository.saveAndLetOthersKnow(this);
     }
 
 }

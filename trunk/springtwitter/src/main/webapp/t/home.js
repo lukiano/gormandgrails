@@ -2,11 +2,17 @@ function buildHtml(tweet) {
     "use strict";
     var html, date, dateString;
     date = new Date(tweet.creationDate);
-    dateString = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDay() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
+    dateString = date.getFullYear() + '-' + date.getMonth() + '-'
+        + date.getDay() + ' ' + date.getHours() + ':'
+        + date.getMinutes() + ':' + date.getSeconds();
     if (tweet.owner.canFollow) {
-        html = "<span><p>User: " + tweet.owner.username + " - Creation date: " + dateString + "</p><p>" + tweet.tweet + "</p></span><hr/>";
+        html = "<span><p>User: <a href='#' onclick='followUser("
+            + tweet.owner.id + ");return false;'>" + tweet.owner.username
+            + "</a> - Creation date: " + dateString + "</p><p>" + tweet.tweet
+            + "</p></span><hr/>";
     } else {
-        html = "<span><p>User: <a href='follow?id=" + tweet.owner.id + "'>" + tweet.owner.username + "</a> - Creation date: " + dateString + "</p><p>" + tweet.tweet + "</p></span><hr/>";
+        html = "<span><p>User: " + tweet.owner.username + " - Creation date: "
+            + dateString + "</p><p>" + tweet.tweet + "</p></span><hr/>";
     }
     return html;
 }
@@ -85,6 +91,16 @@ function getTweetCallback(data) {
 function getTweets() {
     "use strict";
     $.getJSON("get", null, getTweetCallback);
+}
+
+function followUserCallback(data) {
+    "use strict";
+    alert(data);
+}
+
+function followUser(id) {
+    "use strict";
+    $.post("new", {id: id}, followUserCallback, 'json');
 }
 
 function ready() {

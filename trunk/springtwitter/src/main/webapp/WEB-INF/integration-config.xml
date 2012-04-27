@@ -13,7 +13,9 @@
 
     <int:annotation-config />
 
-    <bean id="messageTemplate" class="org.springframework.integration.core.MessagingTemplate" />
+    <bean id="messageTemplate" class="org.springframework.integration.core.MessagingTemplate">
+        <constructor-arg index="0" ref="newTweetNotificationChannel" />
+    </bean>
 
     <int:channel id="newTweetNotificationChannel" /> <!-- outbound channel -->
     <int:transformer input-channel="newTweetNotificationChannel"
@@ -22,9 +24,7 @@
     <int:channel id="outboundNotificationChannel" /> <!-- outbound channel -->
     <int-jms:outbound-channel-adapter
             channel="outboundNotificationChannel"
-            connection-factory="connectionFactory"
-            destination="daTopic"
-            pub-sub-domain="true" />
+            jms-template="jmsTemplate" />
 
     <int:channel id="inboundNotificationChannel" />
     <int-jms:message-driven-channel-adapter
@@ -32,7 +32,8 @@
             connection-factory="connectionFactory"
             transaction-manager="transactionManager"
             destination="daTopic"
-            pub-sub-domain="true" />
+            pub-sub-domain="true"
+            acknowledge="transacted" />
     <int:service-activator input-channel="inboundNotificationChannel" ref="userService" method="refreshFollowersFor" />
 
 </beans>

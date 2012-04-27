@@ -3,54 +3,53 @@ package com.lucho.repository;
 import com.lucho.domain.QUser;
 import com.lucho.domain.User;
 import org.springframework.data.jpa.repository.support.QueryDslRepositorySupport;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-public class UserRepositoryImpl extends QueryDslRepositorySupport implements UserRepositoryCustom {
+/**
+ * Default {@link UserRepository} implementation.
+ *
+ * @author Luciano.Leggieri
+ */
+@Transactional(readOnly = true)
+public class UserRepositoryImpl extends QueryDslRepositorySupport
+        implements UserRepositoryCustom {
 
-    @Override
-    public User addUser(final String username, final String password) {
-        User newUser = null;
-        if (!this.userExists(username)) {
-            User user = new User(username, password);
-            this.getEntityManager().persist(user);
-            List<User> followedBy = user.getFollowedBy();
-            if (followedBy == null) {
-                followedBy = new ArrayList<User>();
-                followedBy.add(user);
-                user.setFollowedBy(followedBy);
-            } else {
-                followedBy.add(user);
-            }
-            newUser = this.getEntityManager().merge(user);
-        }
-        return newUser;
-    }
-
-    @Override
-    public boolean userExists(final String username) {
+    /**
+     * queries if a user is not being followed by another user.
+     * @param user user.
+     * @param userToFollow user to follow.
+     * @return true if userToFollow is not being followed by user.
+     */
+    private boolean notFollowedBy(final User user, final User userToFollow) {
         QUser quser = QUser.user;
-        return this.from(quser).where(quser.username.eq(username)).exists();
-    }
-
-    @Override
-    public boolean notFollowedBy(final User user, final User userToFollow) {
-        QUser quser = QUser.user;
-        QUser followedBy = new QUser("followedBy");
+        QUser followedBy = new QUser(quser.followedBy.getMetadata());
         return this.from(quser).join(quser.followedBy, followedBy)
-                .where(quser.id.eq(user.getId()).and(followedBy.id.eq(userToFollow.getId()))).notExists();
+                .where(
+                        quser.id.eq(user.getId())
+                        .and(followedBy.id.eq(userToFollow.getId()))
+                ).notExists();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Transactional
     @Override
-    public void followUser(final User user, final User userToFollow) {
+    public final boolean followUser(final User user, final User userToFollow) {
+        boolean nowFollows = false;
         if (this.notFollowedBy(user, userToFollow)) {
             User mergedUser = this.getEntityManager().merge(user);
-            User mergedUserToFollow = this.getEntityManager().merge(userToFollow);
-            List<User> followedBy = mergedUserToFollow.getFollowedBy();
+            User mergedUserToFollow =
+                    this.getEntityManager().merge(userToFollow);
+            Set<User> followedBy = mergedUserToFollow.getFollowedBy();
             followedBy.add(mergedUser);
             this.getEntityManager().merge(mergedUserToFollow);
+            nowFollows = true;
         }
+        return nowFollows;
     }
 
 }

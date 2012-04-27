@@ -1,12 +1,18 @@
 package com.lucho.domain;
 
+import com.lucho.repository.TweetRepository;
+import com.lucho.repository.UserRepository;
+import com.lucho.service.UserService;
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.inject.Inject;
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,7 +24,9 @@ import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Size;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Represents a user of the system.
@@ -29,7 +37,33 @@ import java.util.List;
 @Table(name = "t_user",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"username"})}
 )
+@Configurable
 public class User implements UserDetails {
+
+    /**
+     * TweetRepository implementation.
+     */
+    @Inject
+    @Transient
+    @JsonIgnore
+    private transient TweetRepository tweetRepository;
+
+    /**
+     * TweetRepository implementation.
+     */
+    @Inject
+    @Transient
+    @JsonIgnore
+    private transient UserRepository userRepository;
+
+    /**
+     * User service.
+     */
+    @Inject
+    @Transient
+    @JsonIgnore
+    private transient UserService userService;
+
 
     /**
      * Unique identifier for serialization purposes.
@@ -56,13 +90,14 @@ public class User implements UserDetails {
 
     @ManyToMany
     @JsonIgnore
-    private List<User> followedBy;
+    private Set<User> followedBy;
 
     @Transient
     @JsonIgnore
     private List<GrantedAuthority> authorities;
 
     @Transient
+    @JsonProperty
     private boolean canFollow;
 
     /**
@@ -74,12 +109,15 @@ public class User implements UserDetails {
 
     /**
      * Creates a new User filling the obligatory fields.
+     *
      * @param name User name.
      * @param pass User password.
      */
     public User(final String name, final String pass) {
         this.username = name;
         this.password = pass;
+        this.followedBy = new HashSet<User>();
+        this.followedBy.add(this);
     }
 
     public final Integer getId() {
@@ -91,10 +129,6 @@ public class User implements UserDetails {
         return username;
     }
 
-    public final void setUsername(final String anUsername) {
-        this.username = anUsername;
-    }
-
     @Override
     @JsonIgnore
     public final Collection<GrantedAuthority> getAuthorities() {
@@ -102,6 +136,7 @@ public class User implements UserDetails {
     }
 
     @JsonIgnore
+    @Override
     public final String getPassword() {
         return password;
     }
@@ -131,26 +166,14 @@ public class User implements UserDetails {
         return true;
     }
 
-    public final void setPassword(final String password) {
-        this.password = password;
-    }
-
     @JsonIgnore
-    public final List<User> getFollowedBy() {
+    public final Set<User> getFollowedBy() {
         return followedBy;
-    }
-
-    public final void setFollowedBy(final List<User> followers) {
-        this.followedBy = followers;
     }
 
     public final void setAuthorities(
             final List<GrantedAuthority> theAuthorities) {
         this.authorities = theAuthorities;
-    }
-
-    public final boolean canFollow() {
-        return canFollow;
     }
 
     public final void setCanFollow(final boolean canIFollow) {
@@ -169,4 +192,29 @@ public class User implements UserDetails {
         return this.id;
     }
 
+    @JsonIgnore
+    public final void save() {
+        this.userRepository.save(this);
+    }
+
+    @JsonIgnore
+    public final Boolean followUser(final User userToFollow) {
+        return this.userRepository.followUser(this, userToFollow);
+    }
+
+    @JsonIgnore
+    public final List<Tweet> getTweetsIncludingFollows(final Long millis) {
+        return this.tweetRepository.getTweetsForUserIncludingFollows(
+                this, millis);
+    }
+
+    @JsonIgnore
+    public final Boolean shouldRefresh() {
+        return this.userService.shouldRefresh(this);
+    }
+
+    @Override
+    public final String toString() {
+        return this.username;
+    }
 }
