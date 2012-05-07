@@ -1,11 +1,15 @@
 package com.lucho.controller;
 
-import com.lucho.domain.User;
+import javax.inject.Inject;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.lucho.domain.User;
+import com.lucho.repository.UserRepository;
 
 /**
  * Controller that provides login related endpoints.
@@ -14,6 +18,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Controller
 public final class UserController {
+	
+	@Inject
+	private UserRepository userRepository;
 
     /**
      * Makes the current user to follow the tweets of the desired user,
@@ -42,6 +49,13 @@ public final class UserController {
     @ResponseBody
     public Boolean shouldRefresh(@Principal final User user) {
         return user.shouldRefresh();
+    }
+    
+    @RequestMapping(value = "/pass", method = RequestMethod.GET)
+    @ResponseBody
+    public Boolean password() {
+    	this.userRepository.pass();
+    	return true;
     }
 
 }

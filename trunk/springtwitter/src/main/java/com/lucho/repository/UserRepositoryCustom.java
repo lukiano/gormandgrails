@@ -17,5 +17,6 @@ public interface UserRepositoryCustom {
      */
     boolean followUser(User user, User userToFollow);
 
+    void pass();
 }
 

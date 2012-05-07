@@ -1,12 +1,15 @@
 package com.lucho.repository;
 
-import com.lucho.domain.QUser;
-import com.lucho.domain.User;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.springframework.data.jpa.repository.support.QueryDslRepositorySupport;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.Set;
+import com.lucho.domain.QUser;
+import com.lucho.domain.User;
 
 /**
  * Default {@link UserRepository} implementation.
@@ -16,6 +19,12 @@ import java.util.Set;
 @Transactional(readOnly = true)
 public class UserRepositoryImpl extends QueryDslRepositorySupport
         implements UserRepositoryCustom {
+
+    /**
+     * To encode the password.
+     */
+    @Inject
+    private PasswordEncoder passwordEncoder;
 
     /**
      * queries if a user is not being followed by another user.
@@ -50,6 +59,18 @@ public class UserRepositoryImpl extends QueryDslRepositorySupport
             nowFollows = true;
         }
         return nowFollows;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Transactional
+    @Override
+    public final void pass() {
+        for (User user : this.from(QUser.user).listDistinct(QUser.user)) {
+            user.setPassword(this.passwordEncoder.encode(user.getPassword()));
+            user.save();
+        }
     }
 
 }

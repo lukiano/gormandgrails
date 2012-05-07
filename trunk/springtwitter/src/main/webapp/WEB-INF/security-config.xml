@@ -31,6 +31,7 @@
     <bean id="authenticationProvider" class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
         <property name="userDetailsService" ref="userService"/>
         <property name="userCache" ref="userCache"/>
+        <property name="passwordEncoder" ref="cryptoPasswordEncoder" />
     </bean>
 
     <bean id="userCache" class="org.springframework.security.core.userdetails.cache.NullUserCache"/>
@@ -57,6 +58,7 @@
 
     <bean id="authenticationSuccessHandler" class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
         <property name="defaultTargetUrl" value="/t/home" />
+        <property name="alwaysUseDefaultTargetUrl" value="true" />
     </bean>
 
     <bean id="authenticationFailureHandler" class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
@@ -87,7 +89,9 @@
         <constructor-arg index="2" ref="tokenRepository" />
     </bean>
 
-    <bean id="tokenRepository" class="org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl" />
+    <bean id="tokenRepository" class="org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
 
     <bean id="rememberMeAuthenticationProvider" class=
             "org.springframework.security.authentication.RememberMeAuthenticationProvider">
@@ -97,5 +101,8 @@
     <bean id="basicEntryPoint" class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
         <property name="realmName" value="springTwitter" />
     </bean>
+    
+    <bean id="cryptoPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
+    
 
 </beans>

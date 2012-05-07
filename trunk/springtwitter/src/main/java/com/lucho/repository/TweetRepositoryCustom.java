@@ -20,9 +20,9 @@ public interface TweetRepositoryCustom {
      */
     List<Tweet> getTweetsForUserIncludingFollows(User user, Long millis);
 
-    List<Tweet> searchTweets(String textToSearch);
+    List<Tweet> searchTweets(String textToSearch, User user);
 
-    void saveAndLetOthersKnow(final Tweet tweet);
+    void saveAndLetOthersKnow(Tweet tweet);
     
     void reindex();
 }
