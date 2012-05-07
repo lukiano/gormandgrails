@@ -18,9 +18,9 @@
 		<constructor-arg ref="infinispanCacheManager" />
 		</bean>
 		
-	<bean id="cacheManagerJNDI" class="com.lucho.util.JNDIExporter" depends-on="cacheManager">
+	<bean id="cacheManagerJNDI" class="com.lucho.util.JNDIExporter">
         <constructor-arg index="0" ref="infinispanCacheManager" />
-        <constructor-arg index="1" value="cacheManager" />
+        <constructor-arg index="1" value="CacheManager" />
 	</bean>
 
 </beans>

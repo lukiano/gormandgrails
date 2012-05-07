@@ -119,11 +119,7 @@ public final class TweetController {
     public List<Tweet> searchInTweets(@Principal final User user,
                                       @RequestParam(value = "text")
                                       final String textToSearch) {
-        List<Tweet> tweetList = this.tweetRepository.searchTweets(textToSearch);
-        for (Tweet tweet : tweetList) {
-            boolean followed = tweet.getOwner().getFollowedBy().contains(user);
-            tweet.getOwner().setCanFollow(!followed);
-        }
+        List<Tweet> tweetList = this.tweetRepository.searchTweets(textToSearch, user);
         return tweetList;
     }
 

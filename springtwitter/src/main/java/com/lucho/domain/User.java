@@ -1,16 +1,9 @@
 package com.lucho.domain;
 
-import com.lucho.repository.TweetRepository;
-import com.lucho.repository.UserRepository;
-import com.lucho.service.UserService;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.validator.constraints.NotEmpty;
-import org.springframework.beans.factory.annotation.Configurable;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.persistence.Cacheable;
@@ -23,10 +16,20 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Size;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.lucho.repository.TweetRepository;
+import com.lucho.repository.UserRepository;
+import com.lucho.service.UserService;
 
 /**
  * Represents a user of the system.
@@ -37,7 +40,7 @@ import java.util.Set;
 @Table(name = "t_user",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"username"})}
 )
-@Configurable
+@Configurable(preConstruction=true)
 public class User implements UserDetails {
 
     /**
@@ -64,6 +67,14 @@ public class User implements UserDetails {
     @JsonIgnore
     private transient UserService userService;
 
+    /**
+     * Password encoder.
+     */
+    @Inject
+    @Transient
+    @JsonIgnore
+    private transient PasswordEncoder passwordEncoder;
+
 
     /**
      * Unique identifier for serialization purposes.
@@ -71,8 +82,6 @@ public class User implements UserDetails {
     private static final long serialVersionUID = 5788883283199993395L;
 
     private static final int MAX_USER_LENGTH = 32;
-    private static final int MAX_PASSWORD_LENGTH = 32;
-    private static final int MIN_PASSWORD_LENGTH = 6;
 
     @Id
     @GeneratedValue
@@ -84,7 +93,6 @@ public class User implements UserDetails {
     private String username;
 
     @NotEmpty
-    @Size(min = MIN_PASSWORD_LENGTH, max = MAX_PASSWORD_LENGTH)
     @JsonIgnore
     private String password;
 
@@ -115,7 +123,7 @@ public class User implements UserDetails {
      */
     public User(final String name, final String pass) {
         this.username = name;
-        this.password = pass;
+        this.password = this.passwordEncoder.encode(pass);
         this.followedBy = new HashSet<User>();
         this.followedBy.add(this);
     }
@@ -139,6 +147,10 @@ public class User implements UserDetails {
     @Override
     public final String getPassword() {
         return password;
+    }
+    
+    public final void setPassword(final String aPass) {
+    	this.password = aPass;
     }
 
 

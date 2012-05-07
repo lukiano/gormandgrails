@@ -1,8 +1,11 @@
 package com.lucho.service.impl;
 
-import com.lucho.domain.User;
-import com.lucho.repository.UserRepository;
-import com.lucho.service.UserService;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.concurrent.ConcurrentMap;
+
+import javax.inject.Inject;
+
 import org.infinispan.api.BasicCacheContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,11 +18,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.ConcurrentMap;
+import com.lucho.domain.User;
+import com.lucho.repository.UserRepository;
+import com.lucho.service.UserService;
 
 /**
  * {@link UserService} default implementation.

@@ -1,10 +1,9 @@
 package com.lucho.repository;
 
-import com.lucho.domain.QTweet;
-import com.lucho.domain.QUser;
-import com.lucho.domain.Tweet;
-import com.lucho.domain.User;
-import com.mysema.query.types.expr.BooleanExpression;
+import java.util.List;
+
+import javax.inject.Inject;
+
 import org.apache.lucene.search.Query;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
@@ -19,8 +18,11 @@ import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import java.util.List;
+import com.lucho.domain.QTweet;
+import com.lucho.domain.QUser;
+import com.lucho.domain.Tweet;
+import com.lucho.domain.User;
+import com.mysema.query.types.expr.BooleanExpression;
 
 /**
  * Default {@link TweetRepository} implementation.
@@ -80,7 +82,7 @@ public class TweetRepositoryImpl extends QueryDslRepositorySupport
      * {@inheritDoc}
      */
     @Override
-    public final List<Tweet> searchTweets(final String textToSearch) {
+    public final List<Tweet> searchTweets(final String textToSearch, final User user) {
         FullTextEntityManager fullTextEntityManager =
                 Search.getFullTextEntityManager(this.getEntityManager());
 
@@ -103,7 +105,12 @@ public class TweetRepositoryImpl extends QueryDslRepositorySupport
                 DatabaseRetrievalMethod.QUERY
         );
         query.setMaxResults(MAX_RESULTS);
-        return query.getResultList();
+        List<Tweet> tweetList = query.getResultList();
+        for (Tweet tweet : tweetList) {
+            boolean followed = tweet.getOwner().getFollowedBy().contains(user);
+            tweet.getOwner().setCanFollow(!followed);
+        }
+        return tweetList;
     }
 
     /**

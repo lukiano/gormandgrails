@@ -11,7 +11,6 @@
     <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean" />
 
     <util:properties id="jdbcConfiguration" location="classpath:jdbcdatasource.properties"/>
-    <util:properties id="hibernateProperties" location="classpath:hibernate.properties"/>
 
     <bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
         <property name="driverClass" value="${datasource.driver}" />
@@ -24,39 +23,16 @@
         <property name="acquireIncrement" value="5"/>
         <property name="statementsCacheSize" value="100"/>
         <property name="releaseHelperThreads" value="3"/>
+        <property name="connectionTestStatement" value="SELECT 1" />
     </bean>
 
     <bean id="dataSourceJNDI" class="com.lucho.util.JNDIExporter" depends-on="dataSource">
         <constructor-arg index="0" ref="dataSource" />
-        <constructor-arg index="1" value="dataSource" />
+        <constructor-arg index="1" value="DataSource" />
     </bean>
-
-    <!--
-    <bean id="xaDataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" init-method="init" destroy-method="close" depends-on="transactionManager">
-    	<property name="className" value="${datasource.classname}" />
-    	<property name="uniqueName" value="XADBMS" />
-        <property name="maxPoolSize" value="50"/>
-        <property name="minPoolSize" value="5"/>
-    	<property name="driverProperties" ref="jdbcConfiguration" />
-    	<property name="ignoreRecoveryFailures" value="true" />
-    	<property name="allowLocalTransactions" value="true" />
-	</bean>
-	-->
-
-    <!-- configure an Atomikos JTA-aware datasource -->
-    <bean id="xaDataSource"
-          class="com.atomikos.jdbc.AtomikosDataSourceBean"
-          init-method="init" destroy-method="close" depends-on="transactionManager">
-        <property name="uniqueResourceName" value="XADBMS" />
-        <property name="maxPoolSize" value="50"/>
-        <property name="minPoolSize" value="5"/>
-        <property name="xaDataSourceClassName" value="${datasource.classname}"/>
-        <property name="xaProperties" ref="jdbcConfiguration" />
-        <property name="poolSize" value="3"/>
-    </bean>
-
+    
     <bean id="sessionFactory"
-          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" depends-on="cacheManagerJNDI, connectionFactoryJNDI">
+          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" depends-on="cacheManagerJNDI, connectionFactoryJNDI, transactionManagerJNDI, userTransactionJNDI">
 
         <property name="dataSource" ref="xaDataSource" />
         <property name="jpaVendorAdapter">
@@ -79,5 +55,39 @@
 
     <bean class="com.lucho.domain.Tweet" scope="prototype" />
     <bean class="com.lucho.domain.User" scope="prototype" />
+
+    <beans profile="bitronix">
+        <bean id="xaDataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" init-method="init" destroy-method="close" depends-on="transactionManager">
+            <property name="className" value="${datasource.classname}" />
+            <property name="uniqueName" value="XADBMS" />
+            <property name="maxPoolSize" value="50"/>
+            <property name="minPoolSize" value="5"/>
+            <property name="driverProperties" ref="jdbcConfiguration" />
+            <property name="ignoreRecoveryFailures" value="true" />
+            <property name="allowLocalTransactions" value="true" />
+        </bean>
+    </beans>    
+
+    <beans profile="atomikos">
+        <!-- configure an Atomikos JTA-aware datasource -->
+        <bean id="xaDataSource"
+              class="com.atomikos.jdbc.AtomikosDataSourceBean"
+              init-method="init" destroy-method="close" depends-on="transactionManager">
+            <property name="uniqueResourceName" value="XADBMS" />
+            <property name="maxPoolSize" value="50"/>
+            <property name="minPoolSize" value="5"/>
+            <property name="xaDataSourceClassName" value="${datasource.classname}"/>
+            <property name="xaProperties" ref="jdbcConfiguration" />
+            <property name="poolSize" value="3"/>
+            <property name="testQuery" value="SELECT 1" />
+        </bean>
+    </beans>
+    
+    <beans profile="master">
+        <util:properties id="hibernateProperties" location="classpath:hibernate-master.properties"/>
+    </beans>
+    <beans profile="slave">
+        <util:properties id="hibernateProperties" location="classpath:hibernate-slave.properties"/>
+    </beans>
 
 </beans>

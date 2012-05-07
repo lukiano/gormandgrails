@@ -1,5 +1,7 @@
 package com.lucho.domain;
 
+import java.io.Serializable;
+
 import com.lucho.repository.TweetRepository;
 import com.lucho.util.LanguageDiscriminator;
 import org.apache.solr.analysis.ASCIIFoldingFilterFactory;
@@ -50,6 +52,7 @@ import javax.validation.constraints.Size;
 @Cacheable
 @CacheFromIndex
 @Table(name = "t_tweet")
+/*
 @AnalyzerDefs({
         @AnalyzerDef(name = "en",
                 tokenizer = @TokenizerDef(factory =
@@ -86,11 +89,29 @@ import javax.validation.constraints.Size;
                                 })
                 })
 })
+*/
+@AnalyzerDef(name = "en",
+tokenizer = @TokenizerDef(factory =
+        StandardTokenizerFactory.class),
+filters = {
+        @TokenFilterDef(factory =
+                StandardFilterFactory.class),
+        @TokenFilterDef(factory =
+                ASCIIFoldingFilterFactory.class),
+        @TokenFilterDef(factory =
+                LowerCaseFilterFactory.class)
+})
 @Configurable
-public class Tweet {
+public class Tweet implements Serializable {
 
 
     /**
+	 * Unique identifier for serialization purposes.
+	 */
+	private static final long serialVersionUID = 1944203463910744459L;
+
+
+	/**
      * TweetRepository implementation.
      */
     @Inject
@@ -127,7 +148,7 @@ public class Tweet {
      * Tweet language.
      */
     @Field
-    @AnalyzerDiscriminator(impl = LanguageDiscriminator.class)
+    //@AnalyzerDiscriminator(impl = LanguageDiscriminator.class)
     private String language;
 
     /**

@@ -10,15 +10,15 @@
 
     <logger name="org.springframework" level="warn" />
     
-    <logger name="org.springframework.jms" level="info" />
+    <logger name="org.springframework.jms" level="warn" />
     
     <logger name="atomikos" level="warn" />
     
-    <logger name="org.springframework.integration" level="info" />
+    <logger name="org.springframework.integration" level="warn" />
 
     <logger name="org.hibernate" level="warn" />
 
-    <logger name="com.luchox" level="debug" />
+    <logger name="com.lucho" level="info" />
 
 
     <root level="warn">
