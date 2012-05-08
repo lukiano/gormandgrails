@@ -14,7 +14,7 @@ public final class TilesViewResolver extends
      * {@inheritDoc}
      */
     @Override
-    protected Class requiredViewClass() {
+    protected Class<TilesView> requiredViewClass() {
         super.requiredViewClass();
         return TilesView.class;
     }

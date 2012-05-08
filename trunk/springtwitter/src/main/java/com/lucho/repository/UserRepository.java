@@ -10,7 +10,7 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
  * @author Luciano.Leggieri
  */
 public interface UserRepository extends JpaRepository<User, Integer>,
-        UserRepositoryCustom, QueryDslPredicateExecutor {
+        UserRepositoryCustom, QueryDslPredicateExecutor<User> {
 
     /**
      * Find a user by its username.

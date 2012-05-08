@@ -18,11 +18,8 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Created with IntelliJ IDEA.
- * User: luciano
- * Date: 4/16/12
- * Time: 2:37 PM
- * To change this template use File | Settings | File Templates.
+ * Created with IntelliJ IDEA. User: luciano Date: 4/16/12 Time: 2:37 PM To
+ * change this template use File | Settings | File Templates.
  */
 public class JMSBackendQueueTask implements Runnable {
 
@@ -35,8 +32,9 @@ public class JMSBackendQueueTask implements Runnable {
     private final String indexName;
     private final IndexManager indexManager;
 
-    public JMSBackendQueueTask(String indexName, Collection<LuceneWork> queue, IndexManager indexManager,
-                               JMSBackendQueueProcessor jmsBackendQueueProcessor) {
+    public JMSBackendQueueTask(String indexName, Collection<LuceneWork> queue,
+            IndexManager indexManager,
+            JMSBackendQueueProcessor jmsBackendQueueProcessor) {
         this.indexName = indexName;
         this.queue = queue;
         this.indexManager = indexManager;
@@ -46,38 +44,39 @@ public class JMSBackendQueueTask implements Runnable {
     public void run() {
         List<LuceneWork> filteredQueue = new ArrayList<LuceneWork>(queue);
         for (LuceneWork work : queue) {
-            if ( work instanceof OptimizeLuceneWork) {
-                //we don't want optimization to be propagated
-                filteredQueue.remove( work );
+            if (work instanceof OptimizeLuceneWork) {
+                // we don't want optimization to be propagated
+                filteredQueue.remove(work);
             }
         }
-        if ( filteredQueue.size() == 0) return;
+        if (filteredQueue.size() == 0)
+            return;
         LuceneWorkSerializer serializer = indexManager.getSerializer();
-        byte[] data = serializer.toSerializedModel( filteredQueue );
+        byte[] data = serializer.toSerializedModel(filteredQueue);
         processor.prepareJMSTools();
         Connection cnn = null;
         Session session;
         try {
             cnn = processor.getJMSFactory().createConnection();
-            //XXX Since this is called in after completion phase, we cannot use a transaction here, so transacted is false.
+            // XXX Since this is called in after completion phase, we cannot use
+            // a transaction here, so transacted is false.
             session = cnn.createSession(false, Session.AUTO_ACKNOWLEDGE);
             ObjectMessage message = session.createObjectMessage();
-            message.setObject( data );
-            message.setStringProperty( INDEX_NAME_JMS_PROPERTY, indexName );
+            message.setObject(data);
+            message.setStringProperty(INDEX_NAME_JMS_PROPERTY, indexName);
             session.createProducer(processor.getJmsQueue()).send(message);
 
             session.close();
-        }
-        catch (JMSException e) {
-            throw new SearchException( "Unable to send Search work to JMS queue: " + processor.getJmsQueueName(), e );
-        }
-        finally {
+        } catch (JMSException e) {
+            throw new SearchException(
+                    "Unable to send Search work to JMS queue: "
+                            + processor.getJmsQueueName(), e);
+        } finally {
             try {
                 if (cnn != null)
                     cnn.close();
-            }
-            catch ( JMSException e ) {
-                log.unableToCloseJmsConnection( processor.getJmsQueueName(), e );
+            } catch (JMSException e) {
+                log.unableToCloseJmsConnection(processor.getJmsQueueName(), e);
             }
         }
     }

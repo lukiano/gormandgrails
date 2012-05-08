@@ -8,30 +8,36 @@ import org.springframework.data.repository.support.DomainClassConverter;
 import org.springframework.format.support.DefaultFormattingConversionService;
 
 /**
- * Adds {@link DomainClassConverter}
- * to the list of default registered converters.
- *
+ * Adds {@link DomainClassConverter} to the list of default registered
+ * converters.
  * @author Luciano.Leggieri
  */
-public class CustomConversionServiceFactoryBean
-        extends ConversionServiceFactoryBean
-        implements ApplicationContextAware {
+public final class CustomConversionServiceFactoryBean extends
+        ConversionServiceFactoryBean implements ApplicationContextAware {
 
+    /**
+     * Spring appcontext is needed by the converter.
+     */
     private ApplicationContext applicationContext;
 
     /**
      * {@inheritDoc}
      */
     protected GenericConversionService createConversionService() {
-        GenericConversionService conversionService
-                = new DefaultFormattingConversionService();
-        DomainClassConverter domainClassConverter =
-                new DomainClassConverter(conversionService);
+        DefaultFormattingConversionService conversionService =
+                new DefaultFormattingConversionService();
+        DomainClassConverter<DefaultFormattingConversionService>
+            domainClassConverter =
+            new DomainClassConverter<DefaultFormattingConversionService>(
+                    conversionService);
         domainClassConverter.setApplicationContext(applicationContext);
         conversionService.addConverter(domainClassConverter);
         return conversionService;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setApplicationContext(final ApplicationContext ac) {
         this.applicationContext = ac;

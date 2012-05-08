@@ -26,7 +26,6 @@ import com.lucho.repository.TweetRepository;
 
 /**
  * MVC Controller for Tweet operations.
- *
  * @author Luciano.Leggieri
  */
 @Controller
@@ -39,7 +38,6 @@ public final class TweetController {
 
     /**
      * Only Class Constructor.
-     *
      * @param tr TweetRepository implementation.
      */
     @Inject
@@ -57,24 +55,28 @@ public final class TweetController {
     @RequestMapping(value = "/t/new", method = RequestMethod.POST)
     @ResponseBody
     public Tweet newTweet(@Principal final User user,
-                          @RequestParam(value = "tweet") final String text) {
+            @RequestParam(value = "tweet") final String text) {
         String language = LocaleContextHolder.getLocale().getLanguage();
         Tweet tweet = new Tweet(user, text, language);
         tweet.save();
         return tweet;
     }
 
+    /**
+     * Shows a friendly message instead of the exception stack trace.
+     * @param pe exception.
+     * @return the exception message.
+     */
     @ExceptionHandler(PersistenceException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handlePersistenceException(final PersistenceException pe) {
         String returnMessage;
-        if (pe.getCause()
-                instanceof ConstraintViolationException) {
-            ConstraintViolationException cve =
-                    (ConstraintViolationException) pe.getCause();
-            ConstraintViolation<?> cv =
-                    cve.getConstraintViolations().iterator().next();
+        if (pe.getCause() instanceof ConstraintViolationException) {
+            ConstraintViolationException cve = (ConstraintViolationException) pe
+                    .getCause();
+            ConstraintViolation<?> cv = cve.getConstraintViolations()
+                    .iterator().next();
             returnMessage = cv.getMessage();
         } else {
             returnMessage = pe.getLocalizedMessage();
@@ -82,6 +84,11 @@ public final class TweetController {
         return returnMessage;
     }
 
+    /**
+     * Shows a friendly message instead of the exception stack trace.
+     * @param de exception.
+     * @return the exception message.
+     */
     @ExceptionHandler(DataAccessException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -89,17 +96,21 @@ public final class TweetController {
         return de.getLocalizedMessage();
     }
 
+    /**
+     * Shows a friendly message instead of the exception stack trace.
+     * @param te exception.
+     * @return the exception message.
+     */
     @ExceptionHandler(TransactionException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleTransactionException(final TransactionException te) {
         String returnMessage;
-        if (te.getMostSpecificCause()
-                instanceof ConstraintViolationException) {
-            ConstraintViolationException cve =
-                    (ConstraintViolationException) te.getMostSpecificCause();
-            ConstraintViolation<?> cv =
-                    cve.getConstraintViolations().iterator().next();
+        if (te.getMostSpecificCause() instanceof ConstraintViolationException) {
+            ConstraintViolationException cve = (ConstraintViolationException) te
+                    .getMostSpecificCause();
+            ConstraintViolation<?> cv = cve.getConstraintViolations()
+                    .iterator().next();
             returnMessage = cv.getMessage();
         } else {
             returnMessage = te.getLocalizedMessage();
@@ -117,31 +128,29 @@ public final class TweetController {
     @RequestMapping(value = "/t/search", method = RequestMethod.GET)
     @ResponseBody
     public List<Tweet> searchInTweets(@Principal final User user,
-                                      @RequestParam(value = "text")
-                                      final String textToSearch) {
-        List<Tweet> tweetList = this.tweetRepository.searchTweets(textToSearch, user);
+            @RequestParam(value = "text") final String textToSearch) {
+        List<Tweet> tweetList = this.tweetRepository.searchTweets(textToSearch,
+                user);
         return tweetList;
     }
 
     /**
      * Gets the User's tweet line.
      * @param user logged in User.
-     * @param millis number of milliseconds that represent a Date.
-     *               The method will return only tweets greater than this date,
-     *               unless the value is null.
-     * @return a lists with the User's tweets and those
-     * of the ones it follows.
+     * @param millis number of milliseconds that represent a Date. The method
+     *            will return only tweets greater than this date, unless the
+     *            value is null.
+     * @return a lists with the User's tweets and those of the ones it follows.
      */
     @Secured({ "ROLE_USER" })
     @RequestMapping(value = "/t/get", method = RequestMethod.GET)
     @ResponseBody
     public List<Tweet> getTweets(@Principal final User user,
-                                 @RequestParam(value = "from", required = false)
-                                 final Long millis) {
+            @RequestParam(value = "from", required = false) final Long millis) {
         return user.getTweetsIncludingFollows(millis);
 
     }
-    
+
     /**
      * Re indexes Tweets.
      * @return true when re indexing completes.
@@ -149,8 +158,8 @@ public final class TweetController {
     @RequestMapping(value = "/reindex", method = RequestMethod.GET)
     @ResponseBody
     public Boolean reindex() {
-    	this.tweetRepository.reindex();
-    	return true;
+        this.tweetRepository.reindex();
+        return true;
     }
 
 }
