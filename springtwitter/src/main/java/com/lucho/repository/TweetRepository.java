@@ -9,5 +9,5 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
  * @author Luciano.Leggieri
  */
 public interface TweetRepository extends JpaRepository<Tweet, Integer>,
-        TweetRepositoryCustom, QueryDslPredicateExecutor {
+        TweetRepositoryCustom, QueryDslPredicateExecutor<Tweet> {
 }

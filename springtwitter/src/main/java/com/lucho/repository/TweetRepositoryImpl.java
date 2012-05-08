@@ -26,18 +26,16 @@ import com.mysema.query.types.expr.BooleanExpression;
 
 /**
  * Default {@link TweetRepository} implementation.
- *
  * @author Luciano.Leggieri
  */
 @Transactional(readOnly = true)
-public class TweetRepositoryImpl extends QueryDslRepositorySupport
-        implements TweetRepositoryCustom {
+public class TweetRepositoryImpl extends QueryDslRepositorySupport implements
+        TweetRepositoryCustom {
 
     /**
      * Maximum number of tweets to return in a search.
      */
     private static final int MAX_RESULTS = 20;
-
 
     /**
      * Spring Integration messaging system.
@@ -45,13 +43,12 @@ public class TweetRepositoryImpl extends QueryDslRepositorySupport
     @Inject
     private MessagingTemplate messagingTemplate;
 
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public final List<Tweet> getTweetsForUserIncludingFollows(
-            final User user, final Long millis) {
+    public final List<Tweet> getTweetsForUserIncludingFollows(final User user,
+            final Long millis) {
         QTweet qtweet = QTweet.tweet1;
         QUser followedBy = new QUser("followedBy");
         BooleanExpression whereClause = followedBy.id.eq(user.getId());
@@ -60,21 +57,19 @@ public class TweetRepositoryImpl extends QueryDslRepositorySupport
             whereClause = whereClause.and(qtweet.creationDate.after(dateTime));
         }
         return this.from(qtweet).join(qtweet.owner.followedBy, followedBy)
-                .where(whereClause)
-                .orderBy(qtweet.creationDate.desc())
-                .limit(MAX_RESULTS)
-                .list(qtweet);
+                .where(whereClause).orderBy(qtweet.creationDate.desc())
+                .limit(MAX_RESULTS).list(qtweet);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public final void reindex() {
-        FullTextEntityManager fullTextEntityManager =
-                Search.getFullTextEntityManager(this.getEntityManager());
+        FullTextEntityManager fullTextEntityManager = Search
+                .getFullTextEntityManager(this.getEntityManager());
         for (Tweet tweet : this.from(QTweet.tweet1).list(QTweet.tweet1)) {
-        	fullTextEntityManager.index(tweet);
+            fullTextEntityManager.index(tweet);
         }
     }
 
@@ -82,9 +77,10 @@ public class TweetRepositoryImpl extends QueryDslRepositorySupport
      * {@inheritDoc}
      */
     @Override
-    public final List<Tweet> searchTweets(final String textToSearch, final User user) {
-        FullTextEntityManager fullTextEntityManager =
-                Search.getFullTextEntityManager(this.getEntityManager());
+    public final List<Tweet> searchTweets(final String textToSearch,
+            final User user) {
+        FullTextEntityManager fullTextEntityManager = Search
+                .getFullTextEntityManager(this.getEntityManager());
 
         // create native Lucene query using the query DSL
         // alternatively you can write the
@@ -93,17 +89,16 @@ public class TweetRepositoryImpl extends QueryDslRepositorySupport
         // The Hibernate Search DSL is recommended though.
         QueryBuilder qb = fullTextEntityManager.getSearchFactory()
                 .buildQueryBuilder().forEntity(Tweet.class).get();
-        Query lQuery = qb.keyword()
-                .onField("tweet").matching(textToSearch).createQuery();
+        Query lQuery = qb.keyword().onField("tweet").matching(textToSearch)
+                .createQuery();
 
         // wrap Lucene query in a org.hibernate.Query
-        FullTextQuery query =
-                fullTextEntityManager.createFullTextQuery(lQuery, Tweet.class);
+        FullTextQuery query = fullTextEntityManager.createFullTextQuery(lQuery,
+                Tweet.class);
         query.initializeObjectsWith(
-                //first looks in 2nd level cache, we take advantage of it.
+                // first looks in 2nd level cache, we take advantage of it.
                 ObjectLookupMethod.SECOND_LEVEL_CACHE,
-                DatabaseRetrievalMethod.QUERY
-        );
+                DatabaseRetrievalMethod.QUERY);
         query.setMaxResults(MAX_RESULTS);
         List<Tweet> tweetList = query.getResultList();
         for (Tweet tweet : tweetList) {
@@ -123,6 +118,5 @@ public class TweetRepositoryImpl extends QueryDslRepositorySupport
         Message<Tweet> message = MessageBuilder.withPayload(tweet).build();
         this.messagingTemplate.send(message);
     }
-
 
 }

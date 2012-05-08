@@ -52,6 +52,11 @@ public final class LoginController {
         this.messages = new MessageSourceAccessor(aMessageSource);
     }
 
+    /**
+     * Shows a friendly message instead of the exception stack trace.
+     * @param pe exception.
+     * @return the exception message.
+     */
     @ExceptionHandler(PersistenceException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -73,6 +78,11 @@ public final class LoginController {
         return returnMessage;
     }
 
+    /**
+     * Shows a friendly message instead of the exception stack trace.
+     * @param de exception.
+     * @return the exception message.
+     */
     @ExceptionHandler(DataAccessException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -86,6 +96,11 @@ public final class LoginController {
         return returnMessage;
     }
 
+    /**
+     * Shows a friendly message instead of the exception stack trace.
+     * @param te exception.
+     * @return the exception message.
+     */
     @ExceptionHandler(TransactionException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)

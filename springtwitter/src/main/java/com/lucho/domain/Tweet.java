@@ -53,72 +53,41 @@ import javax.validation.constraints.Size;
 @CacheFromIndex
 @Table(name = "t_tweet")
 /*
-@AnalyzerDefs({
-        @AnalyzerDef(name = "en",
-                tokenizer = @TokenizerDef(factory =
-                        StandardTokenizerFactory.class),
-                filters = {
-                        @TokenFilterDef(factory =
-                                StandardFilterFactory.class),
-                        @TokenFilterDef(factory =
-                                ASCIIFoldingFilterFactory.class),
-                        @TokenFilterDef(factory =
-                                LowerCaseFilterFactory.class),
-                        @TokenFilterDef(factory =
-                                SnowballPorterFilterFactory.class,
-                                params = {
-                                        @Parameter(name = "language",
-                                                value = "English")
-                                })
-                }),
-        @AnalyzerDef(name = "es",
-                tokenizer = @TokenizerDef(factory =
-                        StandardTokenizerFactory.class),
-                filters = {
-                        @TokenFilterDef(factory =
-                                StandardFilterFactory.class),
-                        @TokenFilterDef(factory =
-                                ASCIIFoldingFilterFactory.class),
-                        @TokenFilterDef(factory =
-                                LowerCaseFilterFactory.class),
-                        @TokenFilterDef(factory =
-                                SnowballPorterFilterFactory.class,
-                                params = {
-                                        @Parameter(name = "language",
-                                                value = "Spanish")
-                                })
-                })
-})
-*/
-@AnalyzerDef(name = "en",
-tokenizer = @TokenizerDef(factory =
-        StandardTokenizerFactory.class),
-filters = {
-        @TokenFilterDef(factory =
-                StandardFilterFactory.class),
-        @TokenFilterDef(factory =
-                ASCIIFoldingFilterFactory.class),
-        @TokenFilterDef(factory =
-                LowerCaseFilterFactory.class)
-})
+ * @AnalyzerDefs({
+ * @AnalyzerDef(name = "en", tokenizer = @TokenizerDef(factory =
+ * StandardTokenizerFactory.class), filters = {
+ * @TokenFilterDef(factory = StandardFilterFactory.class),
+ * @TokenFilterDef(factory = ASCIIFoldingFilterFactory.class),
+ * @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+ * @TokenFilterDef(factory = SnowballPorterFilterFactory.class, params = {
+ * @Parameter(name = "language", value = "English") }) }),
+ * @AnalyzerDef(name = "es", tokenizer = @TokenizerDef(factory =
+ * StandardTokenizerFactory.class), filters = {
+ * @TokenFilterDef(factory = StandardFilterFactory.class),
+ * @TokenFilterDef(factory = ASCIIFoldingFilterFactory.class),
+ * @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+ * @TokenFilterDef(factory = SnowballPorterFilterFactory.class, params = {
+ * @Parameter(name = "language", value = "Spanish") }) }) })
+ */
+@AnalyzerDef(name = "en", tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class), filters = {
+        @TokenFilterDef(factory = StandardFilterFactory.class),
+        @TokenFilterDef(factory = ASCIIFoldingFilterFactory.class),
+        @TokenFilterDef(factory = LowerCaseFilterFactory.class) })
 @Configurable
 public class Tweet implements Serializable {
 
+    /**
+     * Unique identifier for serialization purposes.
+     */
+    private static final long serialVersionUID = 1944203463910744459L;
 
     /**
-	 * Unique identifier for serialization purposes.
-	 */
-	private static final long serialVersionUID = 1944203463910744459L;
-
-
-	/**
      * TweetRepository implementation.
      */
     @Inject
     @Transient
     @JsonIgnore
     private TweetRepository tweetRepository;
-
 
     /**
      * Maximum length for a tweet text.
@@ -140,7 +109,7 @@ public class Tweet implements Serializable {
     @NotEmpty
     @Size(max = MAX_TWEET_LENGTH)
     @Field(index = Index.YES, store = Store.COMPRESS,
-            termVector = TermVector.WITH_POSITION_OFFSETS)
+        termVector = TermVector.WITH_POSITION_OFFSETS)
     @JsonProperty
     private String tweet;
 
@@ -148,7 +117,7 @@ public class Tweet implements Serializable {
      * Tweet language.
      */
     @Field
-    //@AnalyzerDiscriminator(impl = LanguageDiscriminator.class)
+    // @AnalyzerDiscriminator(impl = LanguageDiscriminator.class)
     private String language;
 
     /**
@@ -159,6 +128,9 @@ public class Tweet implements Serializable {
     @JsonProperty
     private User owner;
 
+    /**
+     * Tweet creation date.
+     */
     @NotNull
     @Past
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
@@ -184,14 +156,16 @@ public class Tweet implements Serializable {
         this.creationDate = new DateTime();
     }
 
+    /**
+     * @return the user who owns this tweet.
+     */
     public final User getOwner() {
         return owner;
     }
 
     @Override
     public final boolean equals(final Object another) {
-        return (another == this)
-                || another instanceof Tweet
+        return (another == this) || another instanceof Tweet
                 && this.id.equals(((Tweet) another).id);
     }
 
@@ -200,8 +174,11 @@ public class Tweet implements Serializable {
         return this.id;
     }
 
+    /**
+     * Persists this tweet and refresh the owner's followers.
+     */
     @JsonIgnore
-    public void save() {
+    public final void save() {
         this.tweetRepository.saveAndLetOthersKnow(this);
     }
 
