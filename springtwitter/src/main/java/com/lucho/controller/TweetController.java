@@ -7,7 +7,7 @@ import javax.persistence.PersistenceException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
-import org.springframework.context.i18n.LocaleContextHolder;
+import org.atmosphere.cpr.AtmosphereResource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.lucho.domain.Tweet;
 import com.lucho.domain.User;
 import com.lucho.repository.TweetRepository;
+import com.lucho.service.TweetService;
+import com.lucho.service.UserService;
 
 /**
  * MVC Controller for Tweet operations.
@@ -37,12 +39,28 @@ public final class TweetController {
     private final TweetRepository tweetRepository;
 
     /**
+     * TweetService implementation.
+     */
+    private final TweetService tweetService;
+
+    /**
+     * UserService implementation.
+     */
+    private final UserService userService;
+
+    /**
      * Only Class Constructor.
      * @param tr TweetRepository implementation.
+     * @param ts TweetService implementation.
+     * @param us UserService implementation.
      */
     @Inject
-    public TweetController(final TweetRepository tr) {
+    public TweetController(final TweetRepository tr,
+            final TweetService ts,
+            final UserService us) {
         this.tweetRepository = tr;
+        this.tweetService = ts;
+        this.userService = us;
     }
 
     /**
@@ -56,10 +74,7 @@ public final class TweetController {
     @ResponseBody
     public Tweet newTweet(@Principal final User user,
             @RequestParam(value = "tweet") final String text) {
-        String language = LocaleContextHolder.getLocale().getLanguage();
-        Tweet tweet = new Tweet(user, text, language);
-        tweet.save();
-        return tweet;
+        return this.tweetService.newTweet(user, text);
     }
 
     /**
@@ -161,5 +176,18 @@ public final class TweetController {
         this.tweetRepository.reindex();
         return true;
     }
+
+    /**
+     * @param user logged in User.
+     * @param event Atmosphere's resource.
+     */
+   @RequestMapping(value = "/websockets", method = RequestMethod.GET)
+   @ResponseBody
+   public void websockets(@Principal final User user,
+           final AtmosphereResource event) {
+       //final HttpServletRequest  req = event.getRequest();
+       event.suspend();
+       this.userService.registerBroadcaster(user, event.getBroadcaster());
+   }
 
 }

@@ -2,15 +2,31 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+       xmlns:int-sec="http://www.springframework.org/schema/integration/security"
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
         http://www.springframework.org/schema/integration
         http://www.springframework.org/schema/integration/spring-integration-2.1.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
         http://www.springframework.org/schema/integration/jms
-        http://www.springframework.org/schema/integration/jms/spring-integration-jms-2.1.xsd">
+        http://www.springframework.org/schema/integration/jms/spring-integration-jms-2.1.xsd
+        http://www.springframework.org/schema/integration/security
+        http://www.springframework.org/schema/integration/security/spring-integration-security-2.1.xsd">
 
+    <context:load-time-weaver aspectj-weaving="on"/>
+    <context:annotation-config />
+    
+    <tx:annotation-driven mode="aspectj" />
+    
+    <context:component-scan base-package="com.lucho.service"/>
+    
     <int:annotation-config />
 
     <bean id="messageTemplate" class="org.springframework.integration.core.MessagingTemplate">
@@ -35,5 +51,9 @@
             pub-sub-domain="true"
             acknowledge="transacted" />
     <int:service-activator input-channel="inboundNotificationChannel" ref="userService" method="refreshFollowersFor" />
+ 
+    <int-sec:secured-channels>
+        <int-sec:access-policy pattern="outboundNotificationChannel" send-access="ROLE_USER" />
+    </int-sec:secured-channels>
 
 </beans>

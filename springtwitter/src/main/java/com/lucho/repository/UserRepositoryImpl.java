@@ -13,7 +13,7 @@ import com.lucho.domain.User;
  *
  * @author Luciano.Leggieri
  */
-@Transactional(readOnly = true)
+@Transactional
 public class UserRepositoryImpl extends QueryDslRepositorySupport
         implements UserRepositoryCustom {
 
@@ -36,7 +36,6 @@ public class UserRepositoryImpl extends QueryDslRepositorySupport
     /**
      * {@inheritDoc}
      */
-    @Transactional
     @Override
     public final boolean followUser(final User user, final User userToFollow) {
         boolean nowFollows = false;

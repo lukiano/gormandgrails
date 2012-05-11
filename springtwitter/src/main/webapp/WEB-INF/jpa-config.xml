@@ -2,12 +2,75 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
         http://www.springframework.org/schema/data/jpa
-        http://www.springframework.org/schema/data/jpa/spring-jpa-1.1.xsd">
+        http://www.springframework.org/schema/data/jpa/spring-jpa-1.1.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+        
+    <context:load-time-weaver aspectj-weaving="on"/>
+    <context:spring-configured />
+    <context:annotation-config />
+        
+    <tx:annotation-driven mode="aspectj" />
+        
+    <bean id="sessionFactory"
+          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" depends-on="cacheManagerJNDI, transactionManagerJNDI, userTransactionJNDI">
+
+        <property name="dataSource" ref="xaDataSource" />
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
+        </property>
+        <property name="persistenceUnitName" value="springtwitter" />
+        <!-- IMPORTANT: make sure to tell Hibernate to use JTA -->
+        <property name="jpaProperties" ref="hibernateProperties" />
+        <property name="jpaPropertyMap">
+            <map>
+                <entry key="javax.persistence.validation.factory" value-ref="validator" />
+            </map>
+
+        </property>
+
+        <property name="persistenceUnitPostProcessors">
+            <bean class="com.lucho.util.JtaPersistenceUnitPostProcessor" />
+        </property>
+    </bean>
 
     <jpa:repositories base-package="com.lucho.repository" />
+
+    <bean class="com.lucho.domain.Tweet" scope="prototype" />
+    <bean class="com.lucho.domain.User" scope="prototype" />
+
+    <beans profile="master">
+        <util:properties id="hibernateProperties" location="classpath:hibernate-master.properties"/>
+
+        <bean id="hibernateSearchController" class="com.lucho.util.JMSHibernateSearchController" />
+        
+        <bean id="hibernateSearchMessageListenerContainer"
+              class="org.springframework.jms.listener.DefaultMessageListenerContainer"
+              depends-on="transactionManager">
+            <property name="transactionManager" ref="transactionManager"/>
+            <property name="connectionFactory" ref="connectionFactory"/>
+            <property name="messageListener" ref="hibernateSearchController"/>
+            <property name="destinationName" value="SEARCHQUEUE"/>
+            <property name="pubSubDomain" value="false" />
+            <property name="concurrentConsumers" value="1"/>
+            <property name="receiveTimeout" value="3000"/>
+            <property name="sessionTransacted" value="true"/>
+        </bean>
+
+    </beans>
+    <beans profile="slave">
+        <util:properties id="hibernateProperties" location="classpath:hibernate-slave.properties"/>
+    </beans>
 
 </beans>
