@@ -40,7 +40,7 @@ import com.lucho.service.UserService;
 @Table(name = "t_user",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"username"})}
 )
-@Configurable(preConstruction=true)
+@Configurable(preConstruction = true)
 public class User implements UserDetails {
 
     /**
@@ -112,7 +112,6 @@ public class User implements UserDetails {
      * Default Class Constructor.
      */
     protected User() {
-
     }
 
     /**

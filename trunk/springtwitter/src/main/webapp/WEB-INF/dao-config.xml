@@ -31,31 +31,6 @@
         <constructor-arg index="1" value="DataSource" />
     </bean>
     
-    <bean id="sessionFactory"
-          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" depends-on="cacheManagerJNDI, connectionFactoryJNDI, transactionManagerJNDI, userTransactionJNDI">
-
-        <property name="dataSource" ref="xaDataSource" />
-        <property name="jpaVendorAdapter">
-        	<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
-        </property>
-        <property name="persistenceUnitName" value="springtwitter" />
-        <!-- IMPORTANT: make sure to tell Hibernate to use JTA -->
-        <property name="jpaProperties" ref="hibernateProperties" />
-        <property name="jpaPropertyMap">
-            <map>
-                <entry key="javax.persistence.validation.factory" value-ref="validator" />
-            </map>
-
-        </property>
-
-        <property name="persistenceUnitPostProcessors">
-            <bean class="com.lucho.util.JtaPersistenceUnitPostProcessor" />
-        </property>
-    </bean>
-
-    <bean class="com.lucho.domain.Tweet" scope="prototype" />
-    <bean class="com.lucho.domain.User" scope="prototype" />
-
     <beans profile="bitronix">
         <bean id="xaDataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" init-method="init" destroy-method="close" depends-on="transactionManager">
             <property name="className" value="${datasource.classname}" />
@@ -83,11 +58,4 @@
         </bean>
     </beans>
     
-    <beans profile="master">
-        <util:properties id="hibernateProperties" location="classpath:hibernate-master.properties"/>
-    </beans>
-    <beans profile="slave">
-        <util:properties id="hibernateProperties" location="classpath:hibernate-slave.properties"/>
-    </beans>
-
 </beans>

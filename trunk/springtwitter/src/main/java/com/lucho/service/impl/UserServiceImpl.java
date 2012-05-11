@@ -1,20 +1,15 @@
 package com.lucho.service.impl;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
 
+import org.atmosphere.cpr.Broadcaster;
 import org.infinispan.api.BasicCacheContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,13 +25,18 @@ import com.lucho.service.UserService;
 @Service("userService")
 @DependsOn("infinispanCacheManager")
 @Transactional
-public final class UserServiceImpl implements UserDetailsService, UserService {
+public final class UserServiceImpl implements UserService {
 
     /**
      * Map that holds the ids of the Users whose tweet line needs
      * to be refreshed.
      */
     private final ConcurrentMap<Integer, Serializable> usersToBeRefreshed;
+
+    /**
+     * Map that holds pair id-broadcaster for websockets.
+     */
+    private final ConcurrentMap<Integer, BroadcastStructure> broadcasters;
 
     /**
      * User repository implementation.
@@ -46,7 +46,12 @@ public final class UserServiceImpl implements UserDetailsService, UserService {
     /**
      * Name of the Transactional Cache used as a {@link ConcurrentMap}.
      */
-    public static final String CACHE_NAME = "refresher";
+    public static final String REFRESHER_CACHE_NAME = "refresher";
+
+    /**
+     * Name of the Transactional Cache used as a {@link ConcurrentMap}.
+     */
+    public static final String BROADCASTER_CACHE_NAME = "broadcaster";
 
     /**
      * Logger.
@@ -64,20 +69,8 @@ public final class UserServiceImpl implements UserDetailsService, UserService {
     public UserServiceImpl(final UserRepository anUserRepository,
                            final BasicCacheContainer ecm) {
         this.userRepository = anUserRepository;
-        this.usersToBeRefreshed = ecm.getCache(CACHE_NAME);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(final String username) {
-        User user = this.userRepository.findByUsername(username);
-        if (user == null) {
-            throw new UsernameNotFoundException(
-                    "User " + username + " not found.");
-        }
-        GrantedAuthority gai = new SimpleGrantedAuthority("ROLE_USER");
-        user.setAuthorities(Collections.singletonList(gai));
-        return user;
+        this.usersToBeRefreshed = ecm.getCache(REFRESHER_CACHE_NAME);
+        this.broadcasters = ecm.getCache(BROADCASTER_CACHE_NAME);
     }
 
     @Override
@@ -86,6 +79,9 @@ public final class UserServiceImpl implements UserDetailsService, UserService {
         LOG.info("Refreshing followers for user " + user);
         for (User follower : user.getFollowedBy()) {
             usersToBeRefreshed.put(follower.getId(), Boolean.TRUE);
+            if (broadcasters.containsKey(ownerId)) {
+                broadcasters.get(ownerId).sendNewTweets();
+            }
         }
     }
 
@@ -100,4 +96,17 @@ public final class UserServiceImpl implements UserDetailsService, UserService {
         return shouldRefresh;
     }
 
+    @Override
+    public void registerBroadcaster(final User user,
+            final Broadcaster broadcaster) {
+        Integer id = user.getId();
+        if (broadcasters.containsKey(id)) {
+            broadcasters.get(id).addBroadcaster(broadcaster);
+        } else {
+            BroadcastStructure broadcastStructure =
+                    new BroadcastStructure(user);
+            broadcasters.put(id, broadcastStructure);
+            broadcastStructure.addBroadcaster(broadcaster);
+        }
+    }
 }

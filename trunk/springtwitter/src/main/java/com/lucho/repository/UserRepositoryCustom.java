@@ -10,7 +10,7 @@ import com.lucho.domain.User;
 public interface UserRepositoryCustom {
 
     /**
-     * @param user         user who wants to follow someone else's tweets.
+     * @param user user who wants to follow someone else's tweets.
      * @param userToFollow the user to follow.
      * @return true if user now follows userToFollow and
      * didn't do it before.

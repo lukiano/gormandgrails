@@ -8,13 +8,13 @@
         </encoder>
     </appender>
 
-    <logger name="org.springframework" level="warn" />
+    <logger name="org.springframework" level="info" />
     
-    <logger name="org.springframework.jms" level="warn" />
+    <!-- <logger name="org.springframework.jms" level="debug" /> -->
     
     <logger name="atomikos" level="warn" />
     
-    <logger name="org.springframework.integration" level="warn" />
+    <!-- <logger name="org.springframework.integration" level="debug" /> -->
 
     <logger name="org.hibernate" level="warn" />
 

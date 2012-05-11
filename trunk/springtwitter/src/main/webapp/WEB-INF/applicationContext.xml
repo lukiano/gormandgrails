@@ -6,18 +6,12 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-        http://www.springframework.org/schema/task
-        http://www.springframework.org/schema/task/spring-task-3.0.xsd
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
-    <context:load-time-weaver aspectj-weaving="on"/>
-    <context:spring-configured />
     <context:annotation-config />
     <context:property-placeholder location="classpath:application.properties" />
     
-    <task:annotation-driven mode="aspectj" />
-
     <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
 
     <bean id="messageSource"
@@ -29,12 +23,7 @@
 
     <import resource="cache-config.xml"/>
     <import resource="tx-config.xml"/>
-    <import resource="security-config.xml"/>
     <import resource="dao-config.xml"/>
-    <import resource="jpa-config.xml"/>
     <import resource="jms-config.xml"/>
-    <import resource="integration-config.xml"/>
-
-    <context:component-scan base-package="com.lucho.service" />
 
 </beans>

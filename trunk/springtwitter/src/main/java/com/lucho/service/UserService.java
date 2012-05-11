@@ -1,5 +1,7 @@
 package com.lucho.service;
 
+import org.atmosphere.cpr.Broadcaster;
+
 import com.lucho.domain.User;
 
 /**
@@ -23,4 +25,6 @@ public interface UserService {
      * @return true if this User should refresh his tweet line.
      */
     boolean shouldRefresh(User user);
+    
+    void registerBroadcaster(User user, Broadcaster broadcaster);
 }

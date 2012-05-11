@@ -198,6 +198,22 @@
         </loaders>
     </namedCache>
 
+    <namedCache name="broadcaster">
+        <clustering mode="invalidation">
+            <async/>
+        </clustering>
+        <transaction useSynchronization="true" transactionMode="TRANSACTIONAL" autoCommit="false"
+                     lockingMode="OPTIMISTIC" transactionManagerLookupClass="com.lucho.util.JndiTransactionManagerLookup" />
+        <locking isolationLevel="REPEATABLE_READ" concurrencyLevel="1000"
+                 lockAcquisitionTimeout="15000" useLockStriping="false"/>
+        <lazyDeserialization enabled="true"/>
+        <!--  Don't ever evict modification timestamps -->
+        <eviction strategy="NONE"/>
+        <expiration wakeUpInterval="0" />
+        <!-- State transfer forces all replication calls to be synchronous,
+                   so for calls to remain async, use a cluster cache loader instead -->
+    </namedCache>
+
 	<!-- *************************************** -->
 	<!-- Cache to store Lucene's file metadata -->
 	<!-- *************************************** -->

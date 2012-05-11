@@ -2,8 +2,6 @@ package com.lucho.repository;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.apache.lucene.search.Query;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
@@ -13,9 +11,6 @@ import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.joda.time.DateTime;
 import org.springframework.data.jpa.repository.support.QueryDslRepositorySupport;
-import org.springframework.integration.Message;
-import org.springframework.integration.core.MessagingTemplate;
-import org.springframework.integration.support.MessageBuilder;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.lucho.domain.QTweet;
@@ -36,12 +31,6 @@ public class TweetRepositoryImpl extends QueryDslRepositorySupport implements
      * Maximum number of tweets to return in a search.
      */
     private static final int MAX_RESULTS = 20;
-
-    /**
-     * Spring Integration messaging system.
-     */
-    @Inject
-    private MessagingTemplate messagingTemplate;
 
     /**
      * {@inheritDoc}
@@ -106,17 +95,6 @@ public class TweetRepositoryImpl extends QueryDslRepositorySupport implements
             tweet.getOwner().setCanFollow(!followed);
         }
         return tweetList;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Transactional
-    @Override
-    public final void saveAndLetOthersKnow(final Tweet tweet) {
-        this.getEntityManager().persist(tweet);
-        Message<Tweet> message = MessageBuilder.withPayload(tweet).build();
-        this.messagingTemplate.send(message);
     }
 
 }

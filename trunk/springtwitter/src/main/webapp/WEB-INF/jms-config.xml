@@ -82,20 +82,6 @@
             <constructor-arg index="1" value="SearchQueue" />
         </bean>
     
-	    <bean id="hibernateSearchController" class="com.lucho.util.JMSHibernateSearchController" />
-	    
-	    <bean id="hibernateSearchMessageListenerContainer"
-	          class="org.springframework.jms.listener.DefaultMessageListenerContainer"
-	          depends-on="transactionManager">
-	        <property name="transactionManager" ref="transactionManager"/>
-	        <property name="connectionFactory" ref="connectionFactory"/>
-	        <property name="messageListener" ref="hibernateSearchController"/>
-	        <property name="destinationName" value="SEARCHQUEUE"/>
-	        <property name="pubSubDomain" value="false" />
-	        <property name="concurrentConsumers" value="1"/>
-	        <property name="receiveTimeout" value="3000"/>
-	        <property name="sessionTransacted" value="true"/>
-	    </bean>
     </beans>
     
     <beans profile="slave">
