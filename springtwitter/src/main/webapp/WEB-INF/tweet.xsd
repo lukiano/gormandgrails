@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.example.org/tweet/" targetNamespace="http://www.example.org/tweet/">
+    <xsd:complexType name="User">
+        <xsd:sequence>
+            <xsd:element name="username" type="xsd:string"></xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="id" type="xsd:int"></xsd:attribute>
+    </xsd:complexType>
+    
+    <xsd:complexType name="Tweet">
+    	<xsd:sequence>
+    		<xsd:element name="text" type="xsd:string"></xsd:element>
+    		<xsd:element name="owner" type="User"></xsd:element>
+    	</xsd:sequence>
+    	<xsd:attribute name="id" type="xsd:int"></xsd:attribute>
+    	<xsd:attribute name="creationDate" type="xsd:dateTime"></xsd:attribute>
+    	<xsd:attribute name="language" type="xsd:string"></xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="TweetList">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="tweet" type="Tweet"></xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+        
+    <xsd:element name="tweetlist" type="TweetList"></xsd:element>
+</xsd:schema>

@@ -3,12 +3,11 @@ package com.lucho.atmosphere;
 import javax.servlet.http.HttpServletRequest;
 
 import org.atmosphere.cpr.AtmosphereResource;
-import org.atmosphere.cpr.FrameworkConfig;
+import org.atmosphere.cpr.Meteor;
 
 /**
  * Helper class to handle Atmosphere.
  * @author Luciano.Leggieri
- *
  */
 public final class AtmosphereUtils {
 
@@ -25,9 +24,16 @@ public final class AtmosphereUtils {
      */
     public static AtmosphereResource getAtmosphereResource(
             final HttpServletRequest request) {
-        AtmosphereResource resource = (AtmosphereResource) request
-                .getAttribute(FrameworkConfig.ATMOSPHERE_RESOURCE);
-        return resource;
+        return getMeteor(request).getAtmosphereResource();
+    }
+
+    /**
+     * Obtains Meteor resources from the request.
+     * @param request an HttpServletRequest.
+     * @return a {@link Meteor} resource. Never returns null.
+     */
+    public static Meteor getMeteor(final HttpServletRequest request) {
+        return Meteor.build(request);
     }
 
 }

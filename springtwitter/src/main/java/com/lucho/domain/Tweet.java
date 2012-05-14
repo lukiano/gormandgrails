@@ -65,7 +65,8 @@ import com.lucho.repository.TweetRepository;
  * @TokenFilterDef(factory = SnowballPorterFilterFactory.class, params = {
  * @Parameter(name = "language", value = "Spanish") }) }) })
  */
-@AnalyzerDef(name = "en", tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class), filters = {
+@AnalyzerDef(name = "en", tokenizer =
+@TokenizerDef(factory = StandardTokenizerFactory.class), filters = {
         @TokenFilterDef(factory = StandardFilterFactory.class),
         @TokenFilterDef(factory = ASCIIFoldingFilterFactory.class),
         @TokenFilterDef(factory = LowerCaseFilterFactory.class) })

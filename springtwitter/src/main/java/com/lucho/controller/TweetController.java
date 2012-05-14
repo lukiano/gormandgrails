@@ -181,11 +181,10 @@ public final class TweetController {
      * @param user logged in User.
      * @param event Atmosphere's resource.
      */
-   @RequestMapping(value = "/websockets", method = RequestMethod.GET)
+   @RequestMapping(value = "/t/websockets", method = RequestMethod.GET)
    @ResponseBody
    public void websockets(@Principal final User user,
            final AtmosphereResource event) {
-       //final HttpServletRequest  req = event.getRequest();
        event.suspend();
        this.userService.registerBroadcaster(user, event.getBroadcaster());
    }
