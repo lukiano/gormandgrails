@@ -10,6 +10,8 @@
 
     <logger name="org.springframework" level="info" />
     
+    <logger name="org.atmosphere" level="debug" />
+    
     <!-- <logger name="org.springframework.jms" level="debug" /> -->
     
     <logger name="atomikos" level="warn" />

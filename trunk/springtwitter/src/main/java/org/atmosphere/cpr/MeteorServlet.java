@@ -5,13 +5,11 @@ import static org.atmosphere.cpr.ApplicationConfig.FILTER_NAME;
 import static org.atmosphere.cpr.ApplicationConfig.MAPPING;
 import static org.atmosphere.cpr.ApplicationConfig.SERVLET_CLASS;
 
+import javax.servlet.Filter;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 
-import org.atmosphere.cpr.AtmosphereServlet;
-import org.atmosphere.cpr.BroadcasterFactory;
-import org.atmosphere.cpr.Meteor;
 import org.atmosphere.handler.ReflectorServletProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,46 +24,64 @@ import org.slf4j.LoggerFactory;
  */
 public final class MeteorServlet extends AtmosphereServlet {
 
-    protected static final Logger logger = LoggerFactory
+
+    /**
+     * Default Serial Version UID.
+     */
+    private static final long serialVersionUID = 3294253087931323969L;
+
+    /**
+     * Logger.
+     */
+    protected static final Logger LOGGER = LoggerFactory
             .getLogger(MeteorServlet.class);
 
+    /**
+     * Servlet to add Meteor.
+     */
     private final Servlet servlet;
+    
+    private final Filter[] filters;
 
-    public MeteorServlet(final Servlet aServlet) {
+    /**
+     * Class constructor.
+     * @param aServlet servlet to add meteor.
+     */
+    public MeteorServlet(final Servlet aServlet, Filter... someFilters) {
         super(false, false);
         this.servlet = aServlet;
+        this.filters = someFilters;
     }
 
     @Override
     public void init(final ServletConfig sc) throws ServletException {
         super.init(sc);
 
-        String servletClass = framework().getAtmosphereConfig()
-                .getInitParameter(SERVLET_CLASS);
+        String servletClass = servlet.getClass().getName();
         String mapping = framework().getAtmosphereConfig().getInitParameter(
                 MAPPING);
         String filterClass = framework().getAtmosphereConfig()
                 .getInitParameter(FILTER_CLASS);
         String filterName = framework().getAtmosphereConfig().getInitParameter(
                 FILTER_NAME);
-
-        logger.info("Installed Servlet/Meteor {} mapped to {}", servletClass,
-                mapping == null ? "/*" : mapping);
+        if (mapping == null) {
+            mapping = "/[a-zA-Z0-9-&_.=;\\?]+";
+            BroadcasterFactory.getDefault().remove("/*");
+        }
+        LOGGER.info("Installed Servlet/Meteor {} mapped to {}", servletClass,
+                mapping);
 
         if (filterClass != null) {
-            logger.info("Installed Filter/Meteor {} mapped to /*", filterClass,
+            LOGGER.info("Installed Filter/Meteor {} mapped to /*", filterClass,
                     mapping);
         }
 
         ReflectorServletProcessor r =
                 new ReflectorServletProcessor(this.servlet);
+        r.setServletClassName(servletClass);
         r.setFilterClassName(filterClass);
         r.setFilterName(filterName);
 
-        if (mapping == null) {
-            mapping = "/*";
-            BroadcasterFactory.getDefault().remove("/*");
-        }
         framework.addAtmosphereHandler(mapping, r).initAtmosphereHandler(sc);
     }
 

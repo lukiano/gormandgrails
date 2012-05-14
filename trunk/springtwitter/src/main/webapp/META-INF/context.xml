@@ -3,4 +3,5 @@
     <!--
     <Loader loaderClass="org.springframework.instrument.classloading.tomcat.TomcatInstrumentableClassLoader"/>
     -->
+    <Loader delegate="true"/>
 </Context>

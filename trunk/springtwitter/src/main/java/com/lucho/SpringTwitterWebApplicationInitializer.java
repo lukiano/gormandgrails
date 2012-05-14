@@ -55,8 +55,7 @@ public final class SpringTwitterWebApplicationInitializer implements
                         "springSecurityFilterChain", securityWac));
         fr.addMappingForUrlPatterns(
                 EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD),
-                true, "/*");
-
+                false, "/*");
         if (rootWac.getEnvironment().acceptsProfiles("websockets")) {
             Servlet dispatcherServlet = new DispatcherServlet(servletWac);
             ServletRegistration.Dynamic dispatcher = servletContext.addServlet(
@@ -116,6 +115,7 @@ public final class SpringTwitterWebApplicationInitializer implements
         if (refresh) {
             wac.refresh();
         }
+        wac.registerShutdownHook();
         return wac;
     }
 
