@@ -583,6 +583,23 @@
         </dependency>
         <dependency>
             <groupId>org.atmosphere</groupId>
+            <artifactId>atmosphere-jgroups</artifactId>
+            <version>${atmosphere.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>jgroups</groupId>
+                    <artifactId>jgroups</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.atmosphere</groupId>
+            <artifactId>atmosphere-jquery</artifactId>
+            <version>${atmosphere.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>org.atmosphere</groupId>
             <artifactId>atmosphere-spring</artifactId>
             <version>${atmosphere.version}</version>
         </dependency>

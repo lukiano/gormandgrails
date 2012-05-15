@@ -1,32 +1,55 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="es" lang="es">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" ></meta>
+    <meta name="author" content="Luciano Leggieri"></meta>
     <title>Spring Twitter</title>
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js">
-    </script>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.20/themes/base/jquery-ui.css" type="text/css" media="all"></link>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/ui/1.8.20/jquery-ui.min.js"></script>
 </head>
 <body>
-<div id="inputBox">
-	<label for="newTweetText">¿Qué estás pensando?</label><input type="text" id="newTweetText" />
-</div>
-<hr />
-<div>
-	<label for="textToSearch">Mostrame los tweets que tienen el siguiente texto:</label><input type="text" id="textToSearch" />
-</div>
-<hr />
-<div id="tweetLineBox">
-    <span>Tu línea de tweets:</span>
-    <div id="tweetLine">
-        <div id="unreadtweets" style="display: none;">Tenés nuevos tweets para leer.</div>
-    </div>
-</div>
-<hr />
-<div id="logout">
-	<a href="../logout">Cerrar sesión</a>
-</div>
-<script type="text/javascript" src="home.js"></script>
-<script type="text/javascript">
-	$(document).ready(ready);
-</script>
+    <div id="contents">
+		<div id="tabs">
+			<ul>
+		        <li><a href="#line">Tus tweets</a></li>
+		        <li><a href="#search">Búsqueda</a></li>
+		    </ul>
+		    <div id="line">
+				<div id="inputBox">
+					<label for="newTweetText">¿Qué estás pensando?</label>
+					<input type="text" id="newTweetText"></input>
+				</div>
+				<hr></hr>
+				<div id="tweetLineBox">
+				    <span>Tu línea de tweets:</span>
+				    <div id="tweetLine">
+				        <div id="unreadtweets" style="display: none;">Tenés nuevos tweets para leer.</div>
+				    </div>
+				</div>
+			</div>
+			<div id="search">
+		        <div>
+		            <label for="textToSearch">Mostrame los tweets que tienen el siguiente texto:</label>
+		            <input type="text" id="textToSearch"></input>
+		        </div>
+		        <hr></hr>
+		        <div id="searchBox">
+		            <span>Resultado de la búsqueda:</span>
+		            <div id="searchLine">
+		            </div>
+		        </div>
+			</div>
+		</div>
+	</div>	
+	<hr></hr>
+	<div id="logout">
+	    <a href="../logout">Cerrar sesión</a>
+	</div>
+	<script type="text/javascript" src="home.js"></script>
+	<script type="text/javascript">
+        var creationDateString = "Fecha de creación";
+        var userString = "Usuario";
+		$(document).ready(ready);
+	</script>
 </body>
 </html>

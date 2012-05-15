@@ -1,9 +1,9 @@
 package org.atmosphere.cpr;
 
-import static org.atmosphere.cpr.ApplicationConfig.FILTER_CLASS;
-import static org.atmosphere.cpr.ApplicationConfig.FILTER_NAME;
 import static org.atmosphere.cpr.ApplicationConfig.MAPPING;
-import static org.atmosphere.cpr.ApplicationConfig.SERVLET_CLASS;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.Filter;
 import javax.servlet.Servlet;
@@ -13,6 +13,8 @@ import javax.servlet.ServletException;
 import org.atmosphere.handler.ReflectorServletProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.lucho.atmosphere.FilterAndName;
 
 /**
  * Simple Servlet to use when Atmosphere {@link Meteor} are used. This Servlet
@@ -41,17 +43,21 @@ public final class MeteorServlet extends AtmosphereServlet {
      */
     private final Servlet servlet;
     
-    private final Filter[] filters;
-
+    private final List<FilterAndName> filters = new ArrayList<FilterAndName>();
+    
     /**
      * Class constructor.
      * @param aServlet servlet to add meteor.
      */
-    public MeteorServlet(final Servlet aServlet, Filter... someFilters) {
+    public MeteorServlet(final Servlet aServlet) {
         super(false, false);
         this.servlet = aServlet;
-        this.filters = someFilters;
     }
+
+    public void addFilter(final Filter f, final String filterName) {
+        this.filters.add(new FilterAndName(f, filterName));
+    }
+    
 
     @Override
     public void init(final ServletConfig sc) throws ServletException {
@@ -60,10 +66,10 @@ public final class MeteorServlet extends AtmosphereServlet {
         String servletClass = servlet.getClass().getName();
         String mapping = framework().getAtmosphereConfig().getInitParameter(
                 MAPPING);
-        String filterClass = framework().getAtmosphereConfig()
-                .getInitParameter(FILTER_CLASS);
-        String filterName = framework().getAtmosphereConfig().getInitParameter(
-                FILTER_NAME);
+//        String filterClass = framework().getAtmosphereConfig()
+//                .getInitParameter(FILTER_CLASS);
+//        String filterName = framework().getAtmosphereConfig().getInitParameter(
+//                FILTER_NAME);
         if (mapping == null) {
             mapping = "/[a-zA-Z0-9-&_.=;\\?]+";
             BroadcasterFactory.getDefault().remove("/*");
@@ -71,16 +77,19 @@ public final class MeteorServlet extends AtmosphereServlet {
         LOGGER.info("Installed Servlet/Meteor {} mapped to {}", servletClass,
                 mapping);
 
-        if (filterClass != null) {
-            LOGGER.info("Installed Filter/Meteor {} mapped to /*", filterClass,
-                    mapping);
-        }
+//        if (filterClass != null) {
+//            LOGGER.info("Installed Filter/Meteor {} mapped to /*", filterClass,
+//                    mapping);
+//        }
 
         ReflectorServletProcessor r =
                 new ReflectorServletProcessor(this.servlet);
         r.setServletClassName(servletClass);
-        r.setFilterClassName(filterClass);
-        r.setFilterName(filterName);
+//        r.setFilterClassName(filterClass);
+//        r.setFilterName(filterName);
+        for (FilterAndName filter : filters) {
+            r.addFilter(filter);
+        }
 
         framework.addAtmosphereHandler(mapping, r).initAtmosphereHandler(sc);
     }

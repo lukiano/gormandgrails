@@ -46,7 +46,6 @@
     <mvc:view-controller path="/" view-name="login" />
     <mvc:view-controller path="/login" />
     <mvc:view-controller path="/signup" />
-    <mvc:view-controller path="/t/home" view-name="home" />
 
     <mvc:default-servlet-handler/>
 
@@ -67,6 +66,8 @@
     </bean>
     
     <beans profile="websockets">
+        <mvc:view-controller path="/t/home" view-name="atmosphere_home" />
+    
 	    <mvc:annotation-driven conversion-service="conversionService" validator="validator">
 	        <mvc:argument-resolvers>
 	            <bean class="com.lucho.util.UserPrincipalWebArgumentResolver" />
@@ -76,6 +77,8 @@
     </beans>
     
     <beans profile="regular">
+        <mvc:view-controller path="/t/home" view-name="home" />
+    
 	    <mvc:annotation-driven conversion-service="conversionService" validator="validator">
 	        <mvc:argument-resolvers>
 	            <bean class="com.lucho.util.UserPrincipalWebArgumentResolver" />
