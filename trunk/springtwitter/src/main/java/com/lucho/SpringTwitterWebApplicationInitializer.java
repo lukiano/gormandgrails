@@ -3,6 +3,7 @@ package com.lucho;
 import java.util.EnumSet;
 
 import javax.servlet.DispatcherType;
+import javax.servlet.Filter;
 import javax.servlet.FilterRegistration;
 import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
@@ -18,6 +19,8 @@ import org.springframework.web.context.ContextLoader;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
+
+import static java.lang.Boolean.TRUE;
 
 /**
  * @author Luciano.Leggieri
@@ -50,32 +53,47 @@ public final class SpringTwitterWebApplicationInitializer implements
 
         servletContext.addListener(HttpSessionEventPublisher.class);
         servletContext.addListener(ContextCleanupListener.class);
-        FilterRegistration fr = servletContext.addFilter(
-                "springSecurityFilterChain", new DelegatingFilterProxy(
-                        "springSecurityFilterChain", securityWac));
-        fr.addMappingForUrlPatterns(
-                EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD),
-                false, "/*");
+
         if (rootWac.getEnvironment().acceptsProfiles("websockets")) {
+            Filter securityFilter = new DelegatingFilterProxy(
+                    "springSecurityFilterChain", securityWac);
             Servlet dispatcherServlet = new DispatcherServlet(servletWac);
+            MeteorServlet meteorServlet = new MeteorServlet(dispatcherServlet);
+            meteorServlet
+                    .addFilter(securityFilter, "springSecurityFilterChain");
             ServletRegistration.Dynamic dispatcher = servletContext.addServlet(
-                    "tweeter", new MeteorServlet(dispatcherServlet));
+                    "tweeter", meteorServlet);
             dispatcher.setInitParameter("org.atmosphere.cpr.broadcasterClass",
                     "org.atmosphere.cpr.DefaultBroadcaster");
-            /*
-            dispatcher.setInitParameter(
-                    "org.atmosphere.cpr.broadcastFilterClasses",
-                    "org.atmosphere.client.JavascriptClientFilter");
-            */
             dispatcher.setInitParameter(
                     "org.atmosphere.cpr.CometSupport.maxInactiveActivity",
                     "30");
-            dispatcher.setInitParameter("org.atmosphere.useStream", "true");
-            dispatcher.setInitParameter("org.atmosphere.useWebSocket", "true");
-            dispatcher.setInitParameter("org.atmosphere.useNative", "true");
+            dispatcher.setInitParameter("org.atmosphere.useStream",
+                    TRUE.toString());
+            dispatcher.setInitParameter("org.atmosphere.useWebSocket",
+                    TRUE.toString());
+            dispatcher.setInitParameter("org.atmosphere.useNative",
+                    TRUE.toString());
+            dispatcher.setInitParameter(
+                    "org.atmosphere.cpr.broadcaster.shareableThreadPool",
+                    TRUE.toString());
+            dispatcher.setInitParameter(
+                    "org.atmosphere.cpr.broadcasterLifeCyclePolicy", "IDLE");
+            dispatcher.setInitParameter(
+                    "org.atmosphere.cpr.AtmosphereInterceptor",
+                    "org.atmosphere.interceptor.JSONPAtmosphereInterceptor,"
+                    + "org.atmosphere.interceptor.SSEAtmosphereInterceptor");
+
             dispatcher.setLoadOnStartup(1);
             dispatcher.addMapping("/");
         } else {
+            FilterRegistration fr = servletContext.addFilter(
+                    "springSecurityFilterChain", new DelegatingFilterProxy(
+                            "springSecurityFilterChain", securityWac));
+            fr.addMappingForUrlPatterns(
+                    EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD),
+                    false, "/*");
+
             ServletRegistration.Dynamic dispatcher = servletContext.addServlet(
                     "tweeter", new DispatcherServlet(servletWac));
             dispatcher.setLoadOnStartup(1);

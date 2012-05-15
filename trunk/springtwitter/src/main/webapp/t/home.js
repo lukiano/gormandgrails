@@ -6,12 +6,12 @@ function buildHtml(tweet) {
         + date.getDay() + ' ' + date.getHours() + ':'
         + date.getMinutes() + ':' + date.getSeconds();
     if (tweet.owner.canFollow) {
-        html = "<span><p>User: <a href='#' onclick='followUser("
+        html = "<span><p>" + userString + ": <a href='#' onclick='followUser("
             + tweet.owner.id + ");return false;'>" + tweet.owner.username
-            + "</a> - Creation date: " + dateString + "</p><p>" + tweet.tweet
+            + "</a> - " + creationDateString + ": " + dateString + "</p><p>" + tweet.tweet
             + "</p></span><hr/>";
     } else {
-        html = "<span><p>User: " + tweet.owner.username + " - Creation date: "
+        html = "<span><p>" + userString + ": " + tweet.owner.username + " - Creation date: "
             + dateString + "</p><p>" + tweet.tweet + "</p></span><hr/>";
     }
     return html;
@@ -21,7 +21,7 @@ function searchTextCallback(data) {
     "use strict";
     var tweetLine, tweet, tts, i;
     if (data) {
-        tweetLine = $("#tweetLine");
+        tweetLine = $("#searchLine");
         tweetLine.empty();
         for (i = 0; i < data.length; i += 1) {
             tweet = data[i];
@@ -105,6 +105,7 @@ function followUser(id) {
 
 function ready() {
     "use strict";
+    $("#tabs").tabs();
     $("#newTweetText").keypress(function (e) {
         if (e.which === 13) {
             newTweet();
@@ -119,6 +120,6 @@ function ready() {
         $(this).text("Triggered ajaxError handler.");
     });
     getTweets();
-    setInterval(checkForNewTweets, 10000);
+    var refreshIntervalId = window.setInterval(checkForNewTweets, 10000);
 }
 

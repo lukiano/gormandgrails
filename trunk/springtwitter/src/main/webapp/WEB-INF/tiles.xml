@@ -10,5 +10,7 @@
     <definition name="signup" template="/WEB-INF/signup.html"/>
 
     <definition name="home" template="/WEB-INF/home.html"/>
+    
+    <definition name="atmosphere_home" template="/WEB-INF/atmosphere_home.html"/>
 
 </tiles-definitions>
