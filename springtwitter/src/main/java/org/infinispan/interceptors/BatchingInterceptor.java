@@ -50,6 +50,7 @@ public class BatchingInterceptor extends CommandInterceptor {
       // if in a batch, attach tx
       if (transactionManager.getTransaction() == null && (tx = batchContainer.getBatchTransaction()) != null) {
          try {
+                //XXX before trying to resume or create a new context, check that the transaction is not committing.
         	if (transactionManager.getStatus() != Status.STATUS_COMMITTED 
         			&& transactionManager.getStatus() != Status.STATUS_COMMITTING &&
         			!ctx.isInTxScope()) {

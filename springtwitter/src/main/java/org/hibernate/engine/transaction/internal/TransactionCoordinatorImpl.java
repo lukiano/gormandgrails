@@ -264,6 +264,11 @@ public class TransactionCoordinatorImpl implements TransactionCoordinator {
     }
 
     @Override
+    public void removeObserver(TransactionObserver observer) {
+            observers.remove( observer );
+    }
+
+    @Override
     @SuppressWarnings( {"unchecked"})
     public boolean isTransactionJoinable() {
         return transactionFactory().isJoinableJtaTransaction( this, currentHibernateTransaction );
