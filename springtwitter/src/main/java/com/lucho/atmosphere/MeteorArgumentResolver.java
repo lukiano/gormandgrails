@@ -14,7 +14,8 @@
  * the License.
  */
 /**
- * This code was donated by Dan Vulpe https://github.com/dvulpe/atmosphere-ws-pubsub
+ * This code was donated by
+ * Dan Vulpe https://github.com/dvulpe/atmosphere-ws-pubsub
  */
 package com.lucho.atmosphere;
 

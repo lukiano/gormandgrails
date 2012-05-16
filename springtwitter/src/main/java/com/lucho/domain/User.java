@@ -81,29 +81,50 @@ public class User implements UserDetails {
      */
     private static final long serialVersionUID = 5788883283199993395L;
 
+    /**
+     * Maximum length of the username string.
+     */
     private static final int MAX_USER_LENGTH = 32;
 
+    /**
+     * User id. It's unique.
+     */
     @Id
     @GeneratedValue
     private Integer id;
 
+    /**
+     * User name. It's unique.
+     */
     @NotEmpty
     @Size(max = MAX_USER_LENGTH)
     @Column(name = "username")
     private String username;
 
+    /**
+     * User password.
+     */
     @NotEmpty
     @JsonIgnore
     private String password;
 
+    /**
+     * Set of {@link User} that follow this one.
+     */
     @ManyToMany
     @JsonIgnore
     private Set<User> followedBy;
 
+    /**
+     * User permissions.
+     */
     @Transient
     @JsonIgnore
     private List<GrantedAuthority> authorities;
 
+    /**
+     * 
+     */
     @Transient
     @JsonProperty
     private boolean canFollow;
@@ -127,6 +148,9 @@ public class User implements UserDetails {
         this.followedBy.add(this);
     }
 
+    /**
+     * @return the user id.
+     */
     public final Integer getId() {
         return id;
     }
@@ -147,7 +171,7 @@ public class User implements UserDetails {
     public final String getPassword() {
         return password;
     }
-    
+
     public final void setPassword(final String aPass) {
     	this.password = aPass;
     }
@@ -177,11 +201,18 @@ public class User implements UserDetails {
         return true;
     }
 
+    /**
+     * @return the users that follow this one.
+     */
     @JsonIgnore
     public final Set<User> getFollowedBy() {
         return followedBy;
     }
 
+    /**
+     * Set the user permissions.
+     * @param theAuthorities a list of permissions
+     */
     public final void setAuthorities(
             final List<GrantedAuthority> theAuthorities) {
         this.authorities = theAuthorities;
@@ -203,22 +234,39 @@ public class User implements UserDetails {
         return this.id;
     }
 
+    /**
+     * Persist this user.
+     */
     @JsonIgnore
     public final void save() {
         this.userRepository.save(this);
     }
 
+    /**
+     * Make this user to follow another one.
+     * @param userToFollow the user to follow.
+     * @return true if the user to follow was not already
+     * being followed. False otherwise.
+     */
     @JsonIgnore
     public final Boolean followUser(final User userToFollow) {
         return this.userRepository.followUser(this, userToFollow);
     }
 
+    /**
+     * 
+     * @param millis
+     * @return
+     */
     @JsonIgnore
     public final List<Tweet> getTweetsIncludingFollows(final Long millis) {
         return this.tweetRepository.getTweetsForUserIncludingFollows(
                 this, millis);
     }
 
+    /**
+     * @return true if this user has new contents in its tweetline.
+     */
     @JsonIgnore
     public final Boolean shouldRefresh() {
         return this.userService.shouldRefresh(this);
