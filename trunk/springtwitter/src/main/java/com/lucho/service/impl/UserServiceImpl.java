@@ -1,11 +1,16 @@
 package com.lucho.service.impl;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
 
-import org.atmosphere.cpr.Broadcaster;
+import org.atmosphere.cpr.AtmosphereResource;
+import org.atmosphere.cpr.AtmosphereResourceEvent;
+import org.atmosphere.cpr.AtmosphereResourceEventListener;
 import org.infinispan.api.BasicCacheContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +18,13 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.base.Supplier;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimaps;
 import com.lucho.domain.User;
+import com.lucho.repository.TweetRepository;
 import com.lucho.repository.UserRepository;
 import com.lucho.service.UserService;
 
@@ -34,9 +45,9 @@ public final class UserServiceImpl implements UserService {
     private final ConcurrentMap<Integer, Serializable> usersToBeRefreshed;
 
     /**
-     * Map that holds pair id-broadcaster for websockets.
+     * Map that holds pair user id for websockets.
      */
-    private final ConcurrentMap<Integer, BroadcastStructure> broadcasters;
+    private final ListMultimap<Integer, WebsocketStructure> websockets;
 
     /**
      * User repository implementation.
@@ -49,9 +60,10 @@ public final class UserServiceImpl implements UserService {
     public static final String REFRESHER_CACHE_NAME = "refresher";
 
     /**
-     * Name of the Transactional Cache used as a {@link ConcurrentMap}.
+     * Repository to get and send the latest tweets.
      */
-    public static final String BROADCASTER_CACHE_NAME = "broadcaster";
+    private final TweetRepository tweetRepository;
+
 
     /**
      * Logger.
@@ -63,14 +75,27 @@ public final class UserServiceImpl implements UserService {
      * Class constructor.
      *
      * @param anUserRepository injects user repository implementation.
+     * @param aTweetRepository injects tweet repository implementation.
      * @param ecm              injects container used to get the Cache Map.
      */
     @Inject
     public UserServiceImpl(final UserRepository anUserRepository,
+                           final TweetRepository aTweetRepository,
                            final BasicCacheContainer ecm) {
         this.userRepository = anUserRepository;
+        this.tweetRepository = aTweetRepository;
         this.usersToBeRefreshed = ecm.getCache(REFRESHER_CACHE_NAME);
-        this.broadcasters = ecm.getCache(BROADCASTER_CACHE_NAME);
+        Supplier<List<WebsocketStructure>> supplier =
+                new Supplier<List<WebsocketStructure>>() {
+
+            @Override
+            public List<WebsocketStructure> get() {
+                return Lists.newArrayList();
+            }
+        };
+        Map<Integer, Collection<WebsocketStructure>> map = Maps.newHashMap();
+        this.websockets = Multimaps.synchronizedListMultimap(
+                Multimaps.newListMultimap(map, supplier));
     }
 
     @Override
@@ -79,8 +104,12 @@ public final class UserServiceImpl implements UserService {
         LOG.info("Refreshing followers for user " + user);
         for (User follower : user.getFollowedBy()) {
             usersToBeRefreshed.put(follower.getId(), Boolean.TRUE);
-            if (broadcasters.containsKey(ownerId)) {
-                broadcasters.get(ownerId).sendNewTweets();
+            synchronized (websockets) {
+                if (websockets.containsKey(ownerId)) {
+                    for (WebsocketStructure wss : websockets.get(ownerId)) {
+                        wss.sendNewTweets();
+                    }
+                }
             }
         }
     }
@@ -97,16 +126,35 @@ public final class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void registerBroadcaster(final User user,
-            final Broadcaster broadcaster) {
-        Integer id = user.getId();
-        if (broadcasters.containsKey(id)) {
-            broadcasters.get(id).addBroadcaster(broadcaster);
-        } else {
-            BroadcastStructure broadcastStructure =
-                    new BroadcastStructure(user);
-            broadcasters.put(id, broadcastStructure);
-            broadcastStructure.addBroadcaster(broadcaster);
-        }
+    public void registerWebsocket(final User user,
+            final AtmosphereResource resource) {
+        final Integer id = user.getId();
+        WebsocketStructure wss = new WebsocketStructure(
+                this.tweetRepository, user, resource);
+        resource.addEventListener(new AtmosphereResourceEventListener() {
+
+            @Override
+            public void onThrowable(final AtmosphereResourceEvent event) {
+                websockets.remove(id, resource);
+            }
+
+            @Override
+            public void onSuspend(final AtmosphereResourceEvent event) {
+            }
+
+            @Override
+            public void onResume(final AtmosphereResourceEvent event) {
+            }
+
+            @Override
+            public void onDisconnect(final AtmosphereResourceEvent event) {
+                websockets.remove(id, resource);
+            }
+
+            @Override
+            public void onBroadcast(final AtmosphereResourceEvent event) {
+            }
+        });
+        websockets.put(id,  wss);
     }
 }

@@ -29,6 +29,12 @@ public final class SpringTwitterWebApplicationInitializer implements
         WebApplicationInitializer {
 
     /**
+     * Websocket timeout in milliseconds.
+     */
+    private static final String WEBSOCKET_INACTIVITY_TIMEOUT_IN_MILLIS =
+            Integer.toString(30 * 60 * 1000);
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -67,7 +73,7 @@ public final class SpringTwitterWebApplicationInitializer implements
                     "org.atmosphere.cpr.DefaultBroadcaster");
             dispatcher.setInitParameter(
                     "org.atmosphere.cpr.CometSupport.maxInactiveActivity",
-                    "30");
+                    WEBSOCKET_INACTIVITY_TIMEOUT_IN_MILLIS);
             dispatcher.setInitParameter("org.atmosphere.useStream",
                     TRUE.toString());
             dispatcher.setInitParameter("org.atmosphere.useWebSocket",

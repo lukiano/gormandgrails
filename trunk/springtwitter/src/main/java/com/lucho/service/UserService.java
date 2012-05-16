@@ -1,6 +1,6 @@
 package com.lucho.service;
 
-import org.atmosphere.cpr.Broadcaster;
+import org.atmosphere.cpr.AtmosphereResource;
 
 import com.lucho.domain.User;
 
@@ -25,6 +25,11 @@ public interface UserService {
      * @return true if this User should refresh his tweet line.
      */
     boolean shouldRefresh(User user);
-    
-    void registerBroadcaster(User user, Broadcaster broadcaster);
+
+    /**
+     * 
+     * @param user
+     * @param resource
+     */
+    void registerWebsocket(User user, AtmosphereResource resource);
 }
